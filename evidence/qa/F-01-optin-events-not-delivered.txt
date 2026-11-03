@@ -1,0 +1,40 @@
+# F-01 evidence - captured 2026-11-03T13:48:45Z as qa_reader (read-only)
+
+## engine.optins
+           id           | first_name |     email     |  artist_slug  | campaign_slug | source | consent |       created_at       
+------------------------+------------+---------------+---------------+---------------+--------+---------+------------------------
+ opt_fd861bb23fa6559153 | ada        | ada@mail.test | solace-avenue | coastline-ep  | Artist | t       | 2026-11-03 13:40:52+00
+ opt_2cd9b3c38acdfb0512 | ada        | ada@mail.test | solace-avenue | coastline-ep  | Artist | t       | 2026-11-03 13:41:37+00
+ opt_858a4e135d13866fe4 | ada        | ada@mail.test | solace-avenue | coastline-ep  | artist | t       | 2026-11-03 13:46:12+00
+(3 rows)
+
+## engine.outbox
+           id           |     type      | attempts | last_status | delivered_at |        next_attempt_at        |          created_at           
+------------------------+---------------+----------+-------------+--------------+-------------------------------+-------------------------------
+ evt_7f39ed5c685bbaf4c8 | optin.created |        4 | 404         |              | 2026-11-03 13:53:35.427212+00 | 2026-11-03 13:40:52.46911+00
+ evt_2c554c25a45b90ab9a | optin.created |        4 | 404         |              | 2026-11-03 13:54:20.411963+00 | 2026-11-03 13:41:37.923356+00
+ evt_82735f99a71b2fd354 | optin.created |        3 | 404         |              | 2026-11-03 13:48:53.385322+00 | 2026-11-03 13:46:12.72917+00
+(3 rows)
+
+## engine.outbox payloads
+           id           |                                                                                                                                 payload                                                                                                                                  
+------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ evt_7f39ed5c685bbaf4c8 | {"createdAt":"2026-11-03T13:40:52Z","data":{"artistSlug":"solace-avenue","campaignSlug":"coastline-ep","consent":true,"email":"ada@mail.test","firstName":"ada","participantId":"","source":"Artist"},"id":"evt_7f39ed5c685bbaf4c8","sequence":1,"type":"optin.created"}
+ evt_2c554c25a45b90ab9a | {"createdAt":"2026-11-03T13:41:37Z","data":{"artistSlug":"solace-avenue","campaignSlug":"coastline-ep","consent":true,"email":"ada@mail.test","firstName":"ada","participantId":"","source":"Artist"},"id":"evt_2c554c25a45b90ab9a","sequence":1,"type":"optin.created"}
+ evt_82735f99a71b2fd354 | {"createdAt":"2026-11-03T13:46:12Z","data":{"artistSlug":"solace-avenue","campaignSlug":"coastline-ep","consent":true,"email":"ada@mail.test","firstName":"ada","participantId":"","source":"artist"},"id":"evt_82735f99a71b2fd354","sequence":1,"type":"optin.created"}
+(3 rows)
+
+## engine.settings (n8n_events_url)
+      key       |                   value                    
+----------------+--------------------------------------------
+ n8n_events_url | http://n8n:5678/webhook-test/solace-events
+(1 row)
+
+## n8n production webhook path is registered (POST only)
+$ curl -s http://localhost:7678/webhook/solace-events
+{"code":404,"message":"This webhook is not registered for GET requests. Did you mean to make a POST request?"}
+
+## Mailpit inbox
+$ curl -s http://localhost:7025/api/v1/messages
+{"total":0,"unread":0,"count":0,"messages_count":0,"messages_unread":0,"start":0,"tags":[],"messages":[]}
+

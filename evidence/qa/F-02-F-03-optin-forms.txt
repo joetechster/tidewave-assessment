@@ -1,0 +1,51 @@
+# F-02 / F-03 evidence - captured 2026-11-03T13:50:07Z
+
+## Artist page opt-in form (consent checkbox)
+$ curl -s http://localhost:7080/artist/solace-avenue | grep -A6 "action=\"/optin\""
+  <form method="post" action="/optin" class="form">
+    <label for="first_name">First name</label><input id="first_name" name="first_name" value="" autocomplete="given-name">
+    <label for="email">Email</label><input id="email" name="email" type="email" value="" autocomplete="email">
+    <p class="small">We will send you news about the band and the new album. You can unsubscribe at any time.</p>
+    <p class="small">Your email is stored by Tidewave Music. We do not sell it.</p>
+    <div class="spacer-sm"></div>
+    <p class="check"><input type="checkbox" name="consent" value="yes" checked><span>Yes, email me updates from Solace Avenue and Tidewave Music.</span></p>
+
+## Campaign page opt-in form
+$ curl -s http://localhost:7080/campaigns/harmattan-sessions | grep -A4 "action=\"/optin\""
+<form method="post" action="/optin" class="form"><input type="hidden" name="from" value="campaign">
+<label for="ofn">First name</label><input id="ofn" name="first_name"><label for="oem">Email</label><input id="oem" name="email" type="email">
+<p class="check"><input type="checkbox" id="oc" name="consent" value="yes"><label for="oc">Email me updates about this campaign.</label></p>
+<button class="btn ghost">Keep me posted</button></form>
+</div></section>
+
+## Engine request log around the opt-ins
+              ts               |       request_id       | method |                    path                    | status |      actor      
+-------------------------------+------------------------+--------+--------------------------------------------+--------+-----------------
+ 2026-11-03 13:40:52.473899+00 | req_c1dc838404482ebea4 | POST   | /optin                                     |    303 | participant:ada
+ 2026-11-03 13:40:52.484648+00 | req_a1b298e496230aa49b | GET    | /artist/solace-avenue?done=1               |    200 | participant:ada
+ 2026-11-03 13:41:37.932851+00 | req_d9a4a2baede0b68cc9 | POST   | /optin                                     |    303 | participant:ada
+ 2026-11-03 13:41:37.945793+00 | req_9452472da51ad87a16 | GET    | /artist/solace-avenue?done=1               |    200 | participant:ada
+ 2026-11-03 13:44:00.276607+00 | req_4a7ec864c4a10bc998 | GET    | /campaigns/harmattan-sessions              |    200 | participant:ada
+ 2026-11-03 13:45:24.650456+00 | req_4e26730dd63359aa3b | GET    | /campaigns/harmattan-sessions?currency=USD |    200 | participant:ada
+ 2026-11-03 13:45:30.186203+00 | req_543f9b8366d7f9a074 | GET    | /campaigns/harmattan-sessions?currency=NGN |    200 | participant:ada
+ 2026-11-03 13:45:37.818804+00 | req_a50bf28f166cb50a99 | GET    | /campaigns/harmattan-sessions?currency=USD |    200 | participant:ada
+ 2026-11-03 13:45:38.313808+00 | req_c4dd1f977df11b2b7d | GET    | /api/docs                                  |    200 | anonymous
+ 2026-11-03 13:46:12.736346+00 | req_218157b1a39d1d0530 | POST   | /optin                                     |    303 | participant:ada
+ 2026-11-03 13:46:12.748954+00 | req_2f2871ab82d108a084 | GET    | /campaigns/harmattan-sessions?optin=1      |    200 | participant:ada
+(11 rows)
+
+## Stored opt-ins
+           id           | campaign_slug | source | consent |       created_at       
+------------------------+---------------+--------+---------+------------------------
+ opt_fd861bb23fa6559153 | coastline-ep  | Artist | t       | 2026-11-03 13:40:52+00
+ opt_2cd9b3c38acdfb0512 | coastline-ep  | Artist | t       | 2026-11-03 13:41:37+00
+ opt_858a4e135d13866fe4 | coastline-ep  | artist | t       | 2026-11-03 13:46:12+00
+(3 rows)
+
+## Campaigns
+        slug        |       title        | is_open 
+--------------------+--------------------+---------
+ harmattan-sessions | Harmattan Sessions | t
+ coastline-ep       | Coastline EP       | f
+(2 rows)
+

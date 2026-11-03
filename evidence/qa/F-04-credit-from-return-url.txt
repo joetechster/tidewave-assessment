@@ -1,0 +1,41 @@
+# F-04 evidence - captured 2026-11-03T13:57:16Z as qa_reader (read-only). Persona ada, receipt 1007.
+
+## Request timeline (engine.request_log)
+              ts               |       request_id       | method |                                  path                                  | status |      actor      
+-------------------------------+------------------------+--------+------------------------------------------------------------------------+--------+-----------------
+ 2026-11-03 13:49:40.516936+00 | req_fea74367449019b07c | POST   | /checkout/quote                                                        |    200 | participant:ada
+ 2026-11-03 13:49:55.249152+00 | req_e90b55ebebc998aab7 | POST   | /checkout/pay                                                          |    303 | participant:ada
+ 2026-11-03 13:49:55.26378+00  | req_b166b8c7cccbd4052f | GET    | /pay/fp_760b3b2c6af26f5f40                                             |    200 | participant:ada
+ 2026-11-03 13:50:01.958247+00 | req_58802de9bcf0c0a78a | POST   | /pay/fp_760b3b2c6af26f5f40                                             |    303 | participant:ada
+ 2026-11-03 13:50:01.971379+00 | req_55ed41a4de6ecb5aa9 | GET    | /pay/fp_760b3b2c6af26f5f40?error=Use+one+of+the+test+cards+shown+below |    200 | participant:ada
+ 2026-11-03 13:50:15.005374+00 | req_b76465430d39b73e32 | POST   | /pay/fp_760b3b2c6af26f5f40?error=Use+one+of+the+test+cards+shown+below |    303 | participant:ada
+ 2026-11-03 13:50:15.035065+00 | req_830e75819b31bae953 | GET    | /checkout/return?payment=pay_4fbfe9ba34d4782759&status=success         |    200 | participant:ada
+ 2026-11-03 13:50:15.714447+00 | req_fc66d3e7673f49b4de | POST   | /webhooks/fakepay                                                      |    200 | fakepay
+ 2026-11-03 13:50:16.419562+00 | req_86d1c904b5fc43ca0f | POST   | /webhooks/fakepay                                                      |    200 | fakepay
+(9 rows)
+
+## Payment
+           id           | receipt_no |   campaign_slug    | currency | amount_minor | fee_minor | charged_minor |  status   |     provider_ref      | last_sequence |       created_at       |       updated_at       
+------------------------+------------+--------------------+----------+--------------+-----------+---------------+-----------+-----------------------+---------------+------------------------+------------------------
+ pay_4fbfe9ba34d4782759 |       1007 | harmattan-sessions | NGN      |       200000 |     10000 |        210000 | succeeded | fp_760b3b2c6af26f5f40 |             0 | 2026-11-03 13:49:55+00 | 2026-11-03 13:50:15+00
+(1 row)
+
+## Ledger (note source + created_at)
+ id |       payment_id       | participant_id |   campaign_slug    |  kind  |  kobo  |   source   |       created_at       
+----+------------------------+----------------+--------------------+--------+--------+------------+------------------------
+  7 | pay_4fbfe9ba34d4782759 | par_ada_616461 | harmattan-sessions | credit | 200000 | return_url | 2026-11-03 13:50:15+00
+(1 row)
+
+## FakePay events / engine inbox
+            id            |        type        |   status   | sequence |      delivered_at      |       created_at       
+--------------------------+--------------------+------------+----------+------------------------+------------------------
+ fpevt_ed9f1e90ba7a6088d7 | payment.processing | processing |        1 | 2026-11-03 13:50:15+00 | 2026-11-03 13:50:14+00
+ fpevt_c4439b6f6d680aabe2 | payment.succeeded  | succeeded  |        2 | 2026-11-03 13:50:16+00 | 2026-11-03 13:50:14+00
+(2 rows)
+
+         event_id         |        type        | sequence |      received_at       | signature_ok 
+--------------------------+--------------------+----------+------------------------+--------------
+ fpevt_ed9f1e90ba7a6088d7 | payment.processing |        1 | 2026-11-03 13:50:15+00 | t
+ fpevt_c4439b6f6d680aabe2 | payment.succeeded  |        2 | 2026-11-03 13:50:16+00 | t
+(2 rows)
+
