@@ -5,6 +5,12 @@ export default defineConfig({
   testDir: path.resolve(__dirname, 'tests'),
   testMatch: /.*\.spec\.ts/,
   fullyParallel: false,
+  // All specs share one seeded engine + leads database and some call resetAll(),
+  // so running files in parallel workers would let one file wipe another's data.
+  workers: 1,
+  retries: 0,
+  // The ops console runs under `next dev`, which compiles each route on first hit.
+  expect: { timeout: 10_000 },
   reporter: [
     ['html', { open: 'never' }],
     ['list']

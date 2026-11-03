@@ -1,5 +1,28 @@
 import { Page } from '@playwright/test';
 
+export const ENGINE_URL = 'http://localhost:7080';
+export const LEADS_URL = 'http://localhost:7081';
+
+// Demo tokens from docs/SETUP.md (local test environment only).
+export const auth = {
+  admin: { Authorization: 'Bearer tw_staff_admin_5f2c9a' },
+  viewer: { Authorization: 'Bearer tw_staff_viewer_81d4e0' },
+  automation: { Authorization: 'Bearer tw_automation_3b7e11' },
+};
+
+/**
+ * Unique, test-domain identity so repeated runs never collide as duplicates
+ * and never address a real mailbox.
+ */
+export function uniquePerson(tag: string) {
+  const id = `${Date.now()}${Math.floor(Math.random() * 1000)}`;
+  return {
+    firstName: `PW${tag}`,
+    email: `pw.${tag.toLowerCase()}.${id}@mail.test`,
+    phone: `+234${id.slice(-10)}`,
+  };
+}
+
 /**
  * Reset all services back to seed data.
  */

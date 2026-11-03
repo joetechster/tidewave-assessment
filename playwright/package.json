@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "test": "playwright test",
+    "test:green": "playwright test --grep-invert @defect",
     "test:ui": "playwright test --ui",
     "report": "playwright show-report"
   },
