@@ -100,7 +100,8 @@ and does not fix the duplicate the PR describes. Details below.
 - **Where**: `src/templates.ts:92-95` as of `e485a5c`:
   `variables[v.name] !== undefined ? variables[v.name] : '' + variables[v.name]` yields the string
   `"undefined"`, so `{{firstName}}` renders "Hi undefined," and `{{#if}}` fallbacks never trigger.
-- **Status**: fixed in commit `ade4282` (`safeValue`, with `leads-service/test/templates.test.ts`).
+- **Status**: fixed in commit `ade4282` (`safeValue`); regression covered by
+  `playwright/tests/api/templates.spec.ts` ("missing variables fall back instead of rendering \"undefined\"").
   The running container was rebuilt with that change, so it cannot be shown live.
 
 ### CR-09 (Low, security): template path traversal
