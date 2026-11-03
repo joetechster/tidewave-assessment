@@ -1,0 +1,227 @@
+{
+  "id": "wf_street_team_lead",
+  "name": "Street Team Lead Application",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "street-team-lead",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        220,
+        300
+      ],
+      "id": "01948b81-0001-7000-8000-000000000001",
+      "name": "Webhook",
+      "webhookId": "5b7c1f1e-3a52-4d7e-9a61-0c2f6a3e1a01"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=http://leads:8081/leads/{{ $json.body.data.leadId }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "options": {
+          "maxTries": 5,
+          "waitBetweenTries": 1000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        300
+      ],
+      "id": "01948b81-0001-7000-8000-000000000002",
+      "name": "Get Lead",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "cred_tidewave_automation",
+          "name": "Tidewave Automation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://leads:8081/templates/street-team-prospect/render",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"variables\": {\n    \"firstName\": \"{{ $json.firstName }}\",\n    \"score\": \"{{ $json.score }}\"\n  },\n  \"test\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        300
+      ],
+      "id": "01948b81-0001-7000-8000-000000000003",
+      "name": "Render Template",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "cred_tidewave_automation",
+          "name": "Tidewave Automation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst lead = $('Get Lead').first().json;\nlet subject = item.subject;\nif (lead.score >= 85) {\n  subject = \"You're now an active Tidewave rep!\";\n}\nreturn [{ json: { ...item, subject, leadEmail: lead.email, leadId: lead.id } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        300
+      ],
+      "id": "01948b81-0001-7000-8000-000000000004",
+      "name": "Format Subject",
+      "notes": "Format email subject according to rep score"
+    },
+    {
+      "parameters": {
+        "fromEmail": "hello@tidewave.test",
+        "toEmail": "={{ $json.leadEmail }}",
+        "subject": "={{ $json.subject }}",
+        "html": "={{ $json.html }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1100,
+        300
+      ],
+      "id": "01948b81-0001-7000-8000-000000000005",
+      "name": "Send Email",
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "smtp": {
+          "id": "cred_mailpit_smtp",
+          "name": "Mailpit SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://leads:8081/leads/{{ $('Format Subject').first().json.leadId }}/activity",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"type\": \"email_sent\",\n  \"detail\": {\n    \"subject\": \"{{ $('Format Subject').first().json.subject }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1320,
+        300
+      ],
+      "id": "01948b81-0001-7000-8000-000000000006",
+      "name": "Record Activity",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "cred_tidewave_automation",
+          "name": "Tidewave Automation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"ok\": true\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1540,
+        300
+      ],
+      "id": "01948b81-0001-7000-8000-000000000007",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Lead": {
+      "main": [
+        [
+          {
+            "node": "Render Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Render Template": {
+      "main": [
+        [
+          {
+            "node": "Format Subject",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Subject": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "Record Activity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record Activity": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "none"
+  }
+}

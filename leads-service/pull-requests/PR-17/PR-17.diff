@@ -1,0 +1,37 @@
+diff --git a/migrations/004_cleanup_duplicates.sql b/migrations/004_cleanup_duplicates.sql
+new file mode 100644
+index 0000000..e69de29
+--- /dev/null
++++ b/migrations/004_cleanup_duplicates.sql
+@@ -0,0 +1,18 @@
++-- Clean up older duplicate leads to prevent clutter in the database
++DELETE FROM leads.lead_activity
++WHERE lead_id IN (
++  SELECT l1.id
++  FROM leads.leads l1
++  JOIN leads.leads l2 ON LOWER(l1.email) = LOWER(l2.email)
++  WHERE l1.created_at < l2.created_at
++);
++
++DELETE FROM leads.leads
++WHERE id IN (
++  SELECT l1.id
++  FROM leads.leads l1
++  JOIN leads.leads l2 ON LOWER(l1.email) = LOWER(l2.email)
++  WHERE l1.created_at < l2.created_at
++);
+diff --git a/src/routes/leads.ts b/src/routes/leads.ts
+index a1b2c3d..e4f5a6b 100644
+--- a/src/routes/leads.ts
++++ b/src/routes/leads.ts
+@@ -48,7 +48,7 @@ leadsRouter.post('/', async (req: Request, res: Response) => {
+     const dupQuery = `
+       SELECT id, status FROM leads.leads
+-      WHERE (email = $1 OR phone = $2) AND consent_withdrawn = false
++      WHERE (LOWER(email) = LOWER($1) OR phone = $2) AND consent_withdrawn = false
+       ORDER BY created_at ASC
+       LIMIT 1
+     `;
+-    const dupRes = await db.query(dupQuery, [email, phone]);
++    const dupRes = await db.query(dupQuery, [email.toLowerCase(), phone]);
+     const isDuplicate = dupRes.rows.length > 0;

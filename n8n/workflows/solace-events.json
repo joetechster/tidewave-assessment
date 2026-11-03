@@ -1,0 +1,422 @@
+{
+  "id": "wf_solace_events",
+  "name": "Solace Avenue Events",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "solace-events",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        200,
+        300
+      ],
+      "id": "01948b82-0001-7000-8000-000000000001",
+      "name": "Webhook",
+      "webhookId": "5b7c1f1e-3a52-4d7e-9a61-0c2f6a3e1a02"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "r1",
+                    "leftValue": "={{ $json.body.type }}",
+                    "rightValue": "optin.created",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "optin.created"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "r2",
+                    "leftValue": "={{ $json.body.type }}",
+                    "rightValue": "payment.updated",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "payment.updated"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        440,
+        300
+      ],
+      "id": "01948b82-0001-7000-8000-000000000002",
+      "name": "Switch Event Type"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "r3",
+                    "leftValue": "={{ $('Webhook').first().json.body.data.source }}",
+                    "rightValue": "artist",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "artist"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        700,
+        180
+      ],
+      "id": "01948b82-0001-7000-8000-000000000003",
+      "name": "Route Source"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://leads:8081/templates/solace-intro/render",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"variables\": {\n    \"firstName\": \"{{ $('Webhook').first().json.body.data.firstName }}\",\n    \"campaignUrl\": \"http://localhost:7080/campaigns/{{ $('Webhook').first().json.body.data.campaignSlug }}\"\n  },\n  \"test\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        100
+      ],
+      "id": "01948b82-0001-7000-8000-000000000004",
+      "name": "Render Solace Intro",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "cred_tidewave_automation",
+          "name": "Tidewave Automation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://leads:8081/templates/street-team-prospect/render",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"variables\": {\n    \"firstName\": \"{{ $('Webhook').first().json.body.data.firstName }}\"\n  },\n  \"test\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        260
+      ],
+      "id": "01948b82-0001-7000-8000-000000000005",
+      "name": "Render Fallback Template",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "cred_tidewave_automation",
+          "name": "Tidewave Automation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "hello@tidewave.test",
+        "toEmail": "={{ $('Webhook').first().json.body.data.email }}",
+        "subject": "={{ $json.subject }}",
+        "html": "={{ $json.html }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1220,
+        180
+      ],
+      "id": "01948b82-0001-7000-8000-000000000006",
+      "name": "Send Intro Email",
+      "credentials": {
+        "smtp": {
+          "id": "cred_mailpit_smtp",
+          "name": "Mailpit SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $('Webhook').first().json.body.data.status }}",
+              "rightValue": "succeeded",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        700,
+        440
+      ],
+      "id": "01948b82-0001-7000-8000-000000000007",
+      "name": "If Payment Succeeded"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://leads:8081/templates/solace-confirmed/render",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"variables\": {\n    \"paymentId\": \"{{ $('Webhook').first().json.body.data.paymentId }}\",\n    \"amountMinor\": \"{{ $('Webhook').first().json.body.data.amountMinor }}\",\n    \"currency\": \"{{ $('Webhook').first().json.body.data.currency }}\"\n  },\n  \"test\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        420
+      ],
+      "id": "01948b82-0001-7000-8000-000000000008",
+      "name": "Render Solace Confirmed",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "cred_tidewave_automation",
+          "name": "Tidewave Automation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "hello@tidewave.test",
+        "toEmail": "={{ $('Webhook').first().json.body.data.email || 'supporter@tidewave.test' }}",
+        "subject": "={{ $json.subject }}",
+        "html": "={{ $json.html }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1220,
+        420
+      ],
+      "id": "01948b82-0001-7000-8000-000000000009",
+      "name": "Send Confirmed Email",
+      "credentials": {
+        "smtp": {
+          "id": "cred_mailpit_smtp",
+          "name": "Mailpit SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"ok\": true\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1460,
+        300
+      ],
+      "id": "01948b82-0001-7000-8000-000000000010",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Switch Event Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Event Type": {
+      "main": [
+        [
+          {
+            "node": "Route Source",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If Payment Succeeded",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Source": {
+      "main": [
+        [
+          {
+            "node": "Render Solace Intro",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Render Fallback Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Render Solace Intro": {
+      "main": [
+        [
+          {
+            "node": "Send Intro Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Render Fallback Template": {
+      "main": [
+        [
+          {
+            "node": "Send Intro Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Payment Succeeded": {
+      "main": [
+        [
+          {
+            "node": "Render Solace Confirmed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Render Solace Confirmed": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmed Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Intro Email": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Confirmed Email": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "none"
+  }
+}

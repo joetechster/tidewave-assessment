@@ -1,0 +1,27 @@
+{
+  "key": "solace-confirmed",
+  "name": "Solace Avenue Backing Confirmed",
+  "audience": "solace-avenue",
+  "status": "approved",
+  "subject": "Your Solace Avenue Backing is Confirmed",
+  "variables": [
+    {
+      "name": "firstName",
+      "label": "First Name",
+      "required": true,
+      "example": "Ada"
+    },
+    {
+      "name": "amountText",
+      "label": "Amount",
+      "required": true,
+      "example": "₦10,000"
+    },
+    {
+      "name": "levelName",
+      "label": "Level Name",
+      "required": true,
+      "example": "Supporter"
+    }
+  ]
+}

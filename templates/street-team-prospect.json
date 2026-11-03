@@ -1,0 +1,27 @@
+{
+  "key": "street-team-prospect",
+  "name": "Street Team Prospect Next Step",
+  "audience": "street-team",
+  "status": "approved",
+  "subject": "Tidewave Street Team - Next Steps",
+  "variables": [
+    {
+      "name": "firstName",
+      "label": "First Name",
+      "required": true,
+      "example": "Kemi"
+    },
+    {
+      "name": "nextStepText",
+      "label": "Next Step Text",
+      "required": true,
+      "example": "Please complete your screening interview booking."
+    },
+    {
+      "name": "screeningUrl",
+      "label": "Screening URL",
+      "required": true,
+      "example": "http://localhost:7080/street-team/screening"
+    }
+  ]
+}

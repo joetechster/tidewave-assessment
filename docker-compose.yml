@@ -1,0 +1,92 @@
+# Tidewave assessment stack. Every value here is fake and assessment-only.
+name: tidewave
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: tidewave
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_admin_pw
+    ports: ["7432:5432"]
+    volumes:
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d tidewave"]
+      interval: 3s
+      retries: 30
+
+  mailpit:
+    image: axllent/mailpit:v1.31.3
+    environment:
+      MP_ENABLE_CHAOS: "true"
+      MP_SMTP_AUTH_ACCEPT_ANY: "1"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "1"
+      MP_MAX_MESSAGES: "5000"
+    ports: ["7025:8025"]
+
+  n8n:
+    image: n8nio/n8n:2.42.0
+    environment:
+      N8N_INSTANCE_OWNER_MANAGED_BY_ENV: "true"
+      N8N_INSTANCE_OWNER_EMAIL: assessor@tidewave.test
+      N8N_INSTANCE_OWNER_FIRST_NAME: Tidewave
+      N8N_INSTANCE_OWNER_LAST_NAME: Assessor
+      N8N_INSTANCE_OWNER_PASSWORD_HASH: '$$2a$$10$$GYJRVyW04IN8lg/EH0k73u.7jq1ceL4/H3Fv.IpjDUkwdLlobypNm'  # bcrypt of the assessment-only password Tidewave!2026
+      N8N_ENCRYPTION_KEY: tidewave-assessment-only-key-0001
+      N8N_SECURE_COOKIE: "false"
+      N8N_DIAGNOSTICS_ENABLED: "false"
+      N8N_PERSONALIZATION_ENABLED: "false"
+      N8N_VERSION_NOTIFICATIONS_ENABLED: "false"
+      N8N_HIRING_BANNER_ENABLED: "false"
+      GENERIC_TIMEZONE: Africa/Lagos
+      TZ: Africa/Lagos
+      WEBHOOK_URL: http://localhost:7678/
+      NODE_FUNCTION_ALLOW_BUILTIN: crypto
+    ports: ["7678:5678"]
+    entrypoint: ["tini", "--", "/bin/sh", "/tidewave/start.sh"]
+    volumes:
+      - n8ndata:/home/node/.n8n
+      - ./tools/n8n:/tidewave:ro
+      - ./n8n/workflows:/tidewave-workflows:ro
+    depends_on: [mailpit]
+
+  engine:
+    image: tidewave/engine:1.0.0
+    environment:
+      DATABASE_URL: postgres://engine_app:engine_pw@db:5432/tidewave
+      LEADS_URL: http://leads:8081
+      FAKEPAY_PUBLIC_URL: http://localhost:7090
+      ENGINE_PUBLIC_URL: http://localhost:7080
+      TZ: UTC
+    ports: ["7080:8080", "7090:8090"]
+    networks:
+      default:
+        aliases: [fakepay]
+    depends_on:
+      db:
+        condition: service_healthy
+
+  leads:
+    build: ./leads-service
+    image: tidewave/leads-service:1.0.0
+    environment:
+      PORT: "8081"
+      DATABASE_URL: postgres://leads_app:leads_pw@db:5432/tidewave
+      STAFF_ADMIN_TOKEN: tw_staff_admin_5f2c9a
+      STAFF_VIEWER_TOKEN: tw_staff_viewer_81d4e0
+      AUTOMATION_TOKEN: tw_automation_3b7e11
+      TOOLS_TOKEN: tw_tools_c0ffee
+      EVENTS_SIGNING_SECRET: whsec_tidewave_demo_2f9a
+      N8N_LEADS_EVENTS_URL: http://n8n:5678/webhook/street-team-lead
+      TEMPLATES_DIR: /templates
+    ports: ["7081:8081"]
+    volumes:
+      - ./templates:/templates:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  dbdata:
+  n8ndata:

@@ -1,0 +1,21 @@
+{
+  "key": "old-promo-draft",
+  "name": "Old Promo Draft",
+  "audience": "solace-avenue",
+  "status": "draft",
+  "subject": "Exclusive Solace Avenue Offer (Draft)",
+  "variables": [
+    {
+      "name": "firstName",
+      "label": "First Name",
+      "required": true,
+      "example": "Bayo"
+    },
+    {
+      "name": "discountCode",
+      "label": "Discount Code",
+      "required": false,
+      "example": "SOLACE10"
+    }
+  ]
+}

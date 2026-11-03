@@ -1,0 +1,21 @@
+{
+  "key": "solace-intro",
+  "name": "Solace Avenue Campaign Intro",
+  "audience": "solace-avenue",
+  "status": "approved",
+  "subject": "Welcome to Solace Avenue",
+  "variables": [
+    {
+      "name": "firstName",
+      "label": "First Name",
+      "required": true,
+      "example": "Ada"
+    },
+    {
+      "name": "campaignUrl",
+      "label": "Campaign URL",
+      "required": true,
+      "example": "http://localhost:7080/campaigns/harmattan-sessions"
+    }
+  ]
+}

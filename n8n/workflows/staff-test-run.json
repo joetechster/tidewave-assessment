@@ -1,0 +1,127 @@
+{
+  "id": "wf_staff_test_run",
+  "name": "Staff Test Run",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "staff-test-run",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        220,
+        300
+      ],
+      "id": "01948b83-0001-7000-8000-000000000001",
+      "name": "Webhook",
+      "webhookId": "5b7c1f1e-3a52-4d7e-9a61-0c2f6a3e1a03"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://leads:8081/templates/{{ $json.body.templateKey }}/render",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"variables\": {{ JSON.stringify($json.body.variables || {}) }},\n  \"test\": true\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        300
+      ],
+      "id": "01948b83-0001-7000-8000-000000000002",
+      "name": "Render Template",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "cred_tidewave_automation",
+          "name": "Tidewave Automation"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "hello@tidewave.test",
+        "toEmail": "={{ $('Webhook').first().json.body.variables.email || 'staff-test@tidewave.test' }}",
+        "subject": "={{ $json.subject }}",
+        "html": "={{ $json.html }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        740,
+        300
+      ],
+      "id": "01948b83-0001-7000-8000-000000000003",
+      "name": "Send Test Email",
+      "credentials": {
+        "smtp": {
+          "id": "cred_mailpit_smtp",
+          "name": "Mailpit SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"ok\": true,\n  \"subject\": \"{{ $('Render Template').first().json.subject }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1000,
+        300
+      ],
+      "id": "01948b83-0001-7000-8000-000000000004",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Render Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Render Template": {
+      "main": [
+        [
+          {
+            "node": "Send Test Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Test Email": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "none"
+  }
+}
