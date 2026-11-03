@@ -1,16 +1,85 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Solace Avenue</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="x-apple-disable-message-reformatting">
+  <title>Solace Avenue: the Harmattan Sessions</title>
+  <style>
+    body { margin: 0; padding: 0; background-color: #f1f5f9; }
+    a { color: #1d4ed8; }
+    @media only screen and (max-width: 600px) {
+      .container { width: 100% !important; }
+      .content { padding: 24px 20px !important; }
+      .cta { width: 100% !important; }
+      .cta a { display: block !important; }
+    }
+  </style>
 </head>
-<body>
-  <div>
-    <h2>Hi {{firstName}},</h2>
-    <p>You asked to hear more about Solace Avenue and the new project.</p>
-    <p>Check out our latest campaign details below.</p>
-    <p><a href="{{campaignUrl}}">Click here</a></p>
-    <p>Best,<br>Tidewave Music</p>
+<body style="margin:0; padding:0; background-color:#f1f5f9;">
+  <!-- Preheader: shown in inbox previews, hidden in the email body -->
+  <div style="display:none; max-height:0; overflow:hidden; mso-hide:all; font-size:1px; line-height:1px; color:#f1f5f9; opacity:0;">
+    Meet the Harmattan Sessions, the new project from Solace Avenue.
+    &#8202;&zwnj;&nbsp;&#8202;&zwnj;&nbsp;&#8202;&zwnj;&nbsp;&#8202;&zwnj;&nbsp;&#8202;&zwnj;&nbsp;&#8202;&zwnj;&nbsp;
   </div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f1f5f9;">
+    <tr>
+      <td align="center" style="padding:24px 12px;">
+        <table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px; background-color:#ffffff; border-radius:8px;">
+          <tr>
+            <td style="padding:20px 32px; background-color:#0f172a; border-radius:8px 8px 0 0; font-family:Arial, Helvetica, sans-serif; font-size:18px; font-weight:bold; color:#ffffff;">
+              Tidewave Music &middot; Solace Avenue
+            </td>
+          </tr>
+          <tr>
+            <td class="content" style="padding:32px; font-family:Arial, Helvetica, sans-serif; font-size:16px; line-height:1.6; color:#0f172a;">
+              <p style="margin:0 0 16px; font-size:20px; font-weight:bold;">
+                Hi {{#if firstName}}{{firstName}}{{else}}there{{/if}},
+              </p>
+              <p style="margin:0 0 16px;">
+                Thanks for asking to hear about Solace Avenue. The band's new project is the Harmattan Sessions, and we would love to share it with you.
+              </p>
+              <p style="margin:0 0 24px;">
+                On the campaign page you can listen to previews, read about the sessions, and, if you would like to, back the project.
+              </p>
+
+              <table role="presentation" class="cta" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px;">
+                <tr>
+                  <td align="center" style="background-color:#1d4ed8; border-radius:6px;">
+                    <a href="{{#if campaignUrl}}{{campaignUrl}}{{else}}http://localhost:7080/campaigns/harmattan-sessions{{/if}}"
+                       style="display:inline-block; padding:14px 28px; font-family:Arial, Helvetica, sans-serif; font-size:16px; font-weight:bold; color:#ffffff; text-decoration:none; border-radius:6px;">
+                      Explore the Harmattan Sessions
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin:0 0 24px; font-size:14px; color:#475569;">
+                If the button does not work, copy this link into your browser:<br>
+                <a href="{{#if campaignUrl}}{{campaignUrl}}{{else}}http://localhost:7080/campaigns/harmattan-sessions{{/if}}" style="color:#1d4ed8; word-break:break-all;">{{#if campaignUrl}}{{campaignUrl}}{{else}}http://localhost:7080/campaigns/harmattan-sessions{{/if}}</a>
+              </p>
+
+              <p style="margin:0;">
+                With thanks,<br>
+                Solace Avenue and the Tidewave Music team
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:20px 32px; border-top:1px solid #e2e8f0; font-family:Arial, Helvetica, sans-serif; font-size:12px; line-height:1.5; color:#475569;">
+              <p style="margin:0 0 8px;">
+                <strong>About backing:</strong> backing the Harmattan Sessions is entirely voluntary. It is a way to support the music. It is not an investment, not a loan, and not employment, and it does not give you any financial return or contractual rights.
+              </p>
+              <p style="margin:0;">
+                You are receiving this email because you asked to hear about Solace Avenue.
+                <a href="{{#if unsubscribeUrl}}{{unsubscribeUrl}}{{else}}mailto:unsubscribe@tidewave.test?subject=Unsubscribe%20solace-avenue{{/if}}" style="color:#475569; text-decoration:underline;">Unsubscribe</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>

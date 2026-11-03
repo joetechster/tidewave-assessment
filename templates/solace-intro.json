@@ -16,6 +16,12 @@
       "label": "Campaign URL",
       "required": true,
       "example": "http://localhost:7080/campaigns/harmattan-sessions"
+    },
+    {
+      "name": "unsubscribeUrl",
+      "label": "Unsubscribe Link",
+      "required": false,
+      "example": "mailto:unsubscribe@tidewave.test?subject=Unsubscribe%20solace-avenue"
     }
   ]
 }
