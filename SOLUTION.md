@@ -96,7 +96,7 @@
 | Claude Opus 5.5 (Claude Code, with Claude in Chrome) | Section C: bug hunt (F-04 to F-08), tickets TW-003 to TW-006 | Run FakePay webhook replay, return-URL, decline and receipt tests in the browser and via `qa_reader`; draft tickets from the evidence | _TODO (candidate)_ | _TODO (candidate)_ |
 | Claude Opus 5.5 (Claude Code) | Section C: leads code review, PR-17 review, test plan | Review `leads-service/` and PR-17, verify findings against the running service, dry-run the migration, draft the review and test plan | _TODO (candidate)_ | _TODO (candidate)_ |
 | Claude Opus 5.5 (Claude Code, with Claude in Chrome) | Section D: both email templates, renderer fix, `/messages/test` screen, test-run API checks, `staff-test-run` recipient lock, Playwright Section D specs | "Clean up section D … keep going until the score is acceptable"; then "score section D and fix everything causing a low score" | _TODO (candidate)_ | _TODO (candidate)_ |
-| | | | | |
+| Claude Opus 5.5 (Claude Code) | Sections A and B: leads `@defect` tests, n8n workflow rebuild, workflow Playwright specs, `tw.mjs` export fix, Section B evidence | "continue the section a and b tasks from previous sessions" | _TODO (candidate)_ | _TODO (candidate)_ |
 
 ---
 
