@@ -44,7 +44,7 @@ Every replay of the same `payment.succeeded` event is accepted (200) and writes 
 - ada's Harmattan Sessions ledger total went from 200000 to **600000 kobo**.
 - `/me` as ada shows "Confirmed backing: ₦6,000.00".
 - Receipt 1007 still shows Backing ₦2,000.00, Fee ₦100.00, Charged ₦2,100.00.
-- FakePay `GET /v1/payments/fp_760b3b2c6af26f5f40` (Bearer `fp_sk_test_tidewave`) still returns a single
+- FakePay `GET /v1/payments/fp_760b3b2c6af26f5f40` (FakePay test API key) still returns a single
   payment: `{"amountMinor":210000,"currency":"NGN","status":"succeeded",...}`.
 
 ## Evidence

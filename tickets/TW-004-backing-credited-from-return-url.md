@@ -22,8 +22,8 @@ FakePay still reports the payment as `created` (never paid).
 4. In the address bar open `http://localhost:7080/checkout/return?payment=<pay_id>&status=success`.
 5. As `qa_reader`: `select status from engine.payments where id = '<pay_id>';` and
    `select kind, kobo, source from engine.ledger where payment_id = '<pay_id>';`
-6. Check FakePay: `GET http://localhost:7090/v1/payments/<fp_ref>` with
-   `Authorization: Bearer fp_sk_test_tidewave`.
+6. Check FakePay: `GET http://localhost:7090/v1/payments/<fp_ref>` with the FakePay test API key shown on the
+   FakePay dashboard.
 
 ## Expected Behavior
 - A backing counts toward a level only when FakePay confirms it (`succeeded`) (PRODUCT_NOTES PR4).
