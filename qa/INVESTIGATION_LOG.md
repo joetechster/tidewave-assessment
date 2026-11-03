@@ -131,4 +131,32 @@ If credited without a FakePay `succeeded` → Critical ticket (PR4/PR14). If not
 | F-01d | Same email opted in 3 times; all accepted, each with its own event. | Product notes don't say whether repeat opt-ins are rejected. | Test plan ambiguity question; Section B dedup must handle it |
 | F-01e | Every event payload has `"sequence": 1`. | Check `/api/docs` for what `sequence` means (per-entity ordering vs global). | Possibly ticket, otherwise note |
 | F-05 | Receipts are sequential numbers (`/me/receipts/1007`). | As ada, open `/me/receipts/1001` … `1006` (other personas' receipts). Any 200 showing another person's receipt breaks PR12. | Ticket if another persona's receipt is visible |
-| F-06 | `payments.last_sequence = 0` after webhooks seq 1 and 2 were accepted. | Replay `fpevt_ed9f1e90ba7a6088d7` (processing, seq 1) after success: does status regress to processing / level drop? | Webhook replay / ordering ticket if state regresses |
+
+---
+
+## F-06: Replaying a FakePay `payment.succeeded` webhook credits the backing again
+
+**Classification**: Engine, **confirmed**, filed as [TW-003](../tickets/TW-003-webhook-replay-double-credits-backing.md)  
+**Rules broken**: PR4 (counts only what FakePay confirms: FakePay confirmed ₦2,000 once), PR6 (levels use the sum of confirmed backings)  
+**Persona**: ada, receipt 1007, `pay_4fbfe9ba34d4782759` / `fp_760b3b2c6af26f5f40`  
+**Evidence**: [`F-06-before.txt`](../evidence/qa/F-06-before.txt),
+[`F-06-after-processing.txt`](../evidence/qa/F-06-after-processing.txt),
+[`F-06-after-succeeded.txt`](../evidence/qa/F-06-after-succeeded.txt),
+[`F-06-after-succeeded-2.txt`](../evidence/qa/F-06-after-succeeded-2.txt),
+[`F-06-pages-after.txt`](../evidence/qa/F-06-pages-after.txt)
+
+Replays were sent from the FakePay dashboard (`POST /dashboard/events/{id}/replay`, the form behind the "Replay" button), same event id, valid signature.
+
+| Time (UTC) | Replay | Engine response | Effect |
+|---|---|---|---|
+| 14:06:53 | `fpevt_ed9f1e90ba7a6088d7` `payment.processing` seq 1 (old, out of order) | 200 `req_a31110982df2c2085c`, inbox row 3 | None: status stays `succeeded`, ledger unchanged. Out-of-order replay handled safely. |
+| 14:07:05 | `fpevt_c4439b6f6d680aabe2` `payment.succeeded` seq 2 (duplicate) | 200 `req_c3ad04430f1a81e796`, inbox row 4 | **New ledger credit id 8, 200000 kobo, `source = provider_webhook`** |
+| 14:07:24 | same `fpevt_c4439b6f6d680aabe2` again | 200, inbox row 5 | **New ledger credit id 9, 200000 kobo** |
+
+- Before: ada's Harmattan ledger total 200000 kobo (1 row). After: **600000 kobo (3 rows)** for a single ₦2,000 backing.
+- FakePay `GET /v1/payments/fp_760b3b2c6af26f5f40` still reports one `succeeded` payment of 210000 (₦2,000 + ₦100 fee).
+- `/me` as ada shows "Confirmed backing: ₦6,000.00"; receipt 1007 still shows Backing ₦2,000.00 / Charged ₦2,100.00.
+- `engine.provider_inbox` stores every delivery as a new row (no unique key on `event_id`); the engine does not dedupe by event id.
+- Each further replay adds ₦2,000, so two more would lift ada to Supporter (₦10,000) without paying. Not executed.
+- Side note: the original `payment.succeeded` delivery (13:50:16) did **not** credit (the return-URL credit from F-04 came first); the replays did. Ticket must describe this as "duplicate delivery of an already-processed event credits again", not "webhook credits twice".
+- Unclear, not claimed: campaign page reads "₦2,000.00 of ₦10,000.00 toward the next level" while `/me` says ₦6,000; may be a different calculation. Check before using.

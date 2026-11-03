@@ -1,0 +1,18 @@
+# F-06 user-visible state after 3 replays (1x seq1, 2x seq2) - 2026-11-03T14:07:55Z, logged in as ada
+
+## GET /me
+ Harmattan Sessions Level: Listener Confirmed backing: ₦6,000.00 
+ Your account My backing and receipts Invite friends Campaign page 
+
+## GET /campaigns/harmattan-sessions
+ Backing levels 
+ Level Total backing What you get 
+ Listener ₦2,000.00 Early stream of every track Supporter ₦10,000.00 Early stream + lossless download + name in the sleeve notes Patron ₦50,000.00 All of that + a signed test pressing 
+ You can back in instalments. Your level is based on your total confirmed backing. 
+ Current level: Listener 
+ ₦2,000.00 of ₦10,000.00 toward the next level. 
+
+## GET /me/receipts/1007
+ Receipt 1007 · Tidewave Music 
+ Receipt #1007 Harmattan Sessions 
+ Date 3 Nov 2026, 13:49 Backing ₦2,000.00 Fee ₦100.00 Charged ₦2,100.00 
