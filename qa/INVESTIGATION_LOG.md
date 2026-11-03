@@ -133,6 +133,18 @@ Variant: declined card (`pay_8ddc95eb7eea544719`, FakePay `failed`, webhook alre
 
 ---
 
+## F-07: Declined card (4000 0000 0000 0002) is handled correctly
+
+**Classification**: Pass, no ticket  
+**Evidence**: [`evidence/qa/F-07-decline.txt`](../evidence/qa/F-07-decline.txt)
+
+ada, ₦2,000, `pay_8ddc95eb7eea544719` / `fp_e5248f0470ea0e8459` (receipt 1009), normal browser flow.
+FakePay sent one `payment.failed` (seq 1); engine set `status = failed`, `last_sequence = 1`, no ledger row,
+queued `payment.updated` `failed`. Return page: "Payment not completed. Your payment of ₦2,000.00 did not go
+through. You have not been charged." Matches PR4.
+
+---
+
 ## Open follow-ups (unverified)
 
 | # | Observation | Next step | Likely destination |
