@@ -154,6 +154,7 @@ through. You have not been charged." Matches PR4.
 | F-01d | Same email opted in 3 times; all accepted, each with its own event. | Product notes don't say whether repeat opt-ins are rejected. | Test plan ambiguity question; Section B dedup must handle it |
 | F-01e | Every event payload has `"sequence": 1`. | Check `/api/docs` for what `sequence` means (per-entity ordering vs global). | Possibly ticket, otherwise note |
 | F-05 | Receipts are sequential numbers (`/me/receipts/1007`). | **Done 14:56Z**: as ada, receipts 1001-1006 (Bayo, Awa, Tunde, Zara, Lola, Dayo) all returned 200 with name and email. | **Filed as [TW-005](../tickets/TW-005-receipts-visible-to-other-participants.md)** (PR12) |
+| F-08 | Receipt times look like UTC (1007 created 13:49:55Z shows 13:49). | **Done 14:57Z**: receipt 1003 (23:20Z) shows "29 Oct 2026, 23:20"; WAT would be 30 Oct 00:20. Quote page uses Lagos time correctly. | **Filed as [TW-006](../tickets/TW-006-receipt-time-not-lagos.md)** (PR9), evidence [`F-08-receipt-time-not-lagos.txt`](../evidence/qa/F-08-receipt-time-not-lagos.txt) |
 
 ---
 

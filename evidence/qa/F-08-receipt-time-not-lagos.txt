@@ -1,0 +1,14 @@
+# F-08 / PR9: receipts show UTC, not Lagos time (WAT, UTC+1) - 2026-11-03T14:57:26Z. Container TZ=UTC (docker-compose).
+
+## Stored timestamp vs receipt display (receipts fetched as ada, see F-05-receipts-other-participants.txt)
+| Receipt | engine.payments.created_at (UTC) | Expected (Lagos, WAT) | Receipt shows |
+|---|---|---|---|
+| 1001 | 2026-10-25 14:25:24+00 | 25 Oct 2026, 15:25 | 25 Oct 2026, 14:25 |
+| 1003 | 2026-10-29 23:20:00+00 | **30 Oct 2026, 00:20** | **29 Oct 2026, 23:20** (wrong date) |
+| 1007 (ada) | 2026-11-03 14:27:21+00 | 3 Nov 2026, 15:27 | 3 Nov 2026, 14:27 |
+
+## ada's own receipt 1007
+GET /me/receipts/1007 -> 'Date 3 Nov 2026, 14:27' (expected 3 Nov 2026, 15:27). Same pattern before reset: receipt 1007 created 13:49:55Z showed '3 Nov 2026, 13:49' (F-06-pages-after.txt).
+
+## Contrast: the quote page does use Lagos time
+POST /checkout/quote req_2ea6789f8173358c50 at 2026-11-03 14:27:12Z rendered 'Quote valid until 15:57 (Lagos)' = 14:57Z + 1h, i.e. quote time + 30 min in WAT (captured in browser, F-06b run).
