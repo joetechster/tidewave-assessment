@@ -13,6 +13,7 @@ export default function MessageTestPage() {
   const router = useRouter();
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [selectedKey, setSelectedKey] = useState<string>('');
   const [values, setValues] = useState<Record<string, string>>({});
   const [missing, setMissing] = useState<string[]>([]);
@@ -41,7 +42,7 @@ export default function MessageTestPage() {
         setTemplates(approved);
         if (approved.length > 0) setSelectedKey(approved[0].key);
       })
-      .catch(() => setNotification({ type: 'error', message: 'Could not load templates. Refresh the page to try again.' }))
+      .catch(() => setLoadError('Could not load templates. Refresh the page to try again.'))
       .finally(() => setLoadingTemplates(false));
   }, [router]);
 
@@ -84,6 +85,8 @@ export default function MessageTestPage() {
   const handleValueChange = (name: string, value: string) => {
     setValues((prev) => ({ ...prev, [name]: value }));
     setMissing((prev) => prev.filter((n) => n !== name));
+    // A previous "Sent"/"Not sent" no longer describes what is on screen.
+    setNotification(null);
   };
 
   const fillWithExamples = () => {
@@ -147,20 +150,14 @@ export default function MessageTestPage() {
         <strong>{STAFF_TEST_RECIPIENT}</strong>, never to customers.
       </p>
 
-      {notification && (
-        <div
-          className={`alert-box alert-${notification.type}`}
-          role={notification.type === 'error' ? 'alert' : 'status'}
-          data-testid="test-run-notification"
-        >
-          {notification.message}
-        </div>
-      )}
-
       <div className="test-layout">
         <div className="card">
           {loadingTemplates ? (
             <p className="muted">Loading templates...</p>
+          ) : loadError ? (
+            <div className="alert-box alert-error" role="alert">
+              {loadError}
+            </div>
           ) : templates.length === 0 ? (
             <p className="muted">No approved templates are available.</p>
           ) : (
@@ -218,6 +215,16 @@ export default function MessageTestPage() {
               })}
 
               <p className="field-hint">* required</p>
+
+              {notification && (
+                <div
+                  className={`alert-box alert-${notification.type}`}
+                  role={notification.type === 'error' ? 'alert' : 'status'}
+                  data-testid="test-run-notification"
+                >
+                  {notification.message}
+                </div>
+              )}
 
               <div className="form-actions">
                 <button type="submit" className="btn btn-primary" disabled={sending || !selected}>
