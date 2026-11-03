@@ -49,7 +49,7 @@
     {
       "parameters": {
         "fromEmail": "hello@tidewave.test",
-        "toEmail": "={{ $('Webhook').first().json.body.variables.email || 'staff-test@tidewave.test' }}",
+        "toEmail": "staff-test@tidewave.test",
         "subject": "={{ $json.subject }}",
         "html": "={{ $json.html }}",
         "options": {}
@@ -72,7 +72,7 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={\n  \"ok\": true,\n  \"subject\": \"{{ $('Render Template').first().json.subject }}\"\n}",
+        "responseBody": "={{ JSON.stringify({ ok: true, to: \"staff-test@tidewave.test\", subject: $(\"Render Template\").first().json.subject }) }}",
         "options": {}
       },
       "type": "n8n-nodes-base.respondToWebhook",
@@ -122,6 +122,6 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "saveDataSuccessExecution": "none"
+    "saveDataSuccessExecution": "all"
   }
 }
