@@ -1,0 +1,44 @@
+# PR-17 migration 004_cleanup_duplicates.sql dry run - 2026-11-03T14:56:01Z
+# Run as leads_app inside BEGIN ... ROLLBACK on freshly reset seed data. Nothing was committed.
+
+## Rows the migration targets (preview SELECT using its own WHERE clause)
+      id      |        email_raw         |      status      | consent_withdrawn |  newer_row   | newer_duplicate_of 
+--------------+--------------------------+------------------+-------------------+--------------+--------------------
+ lead_seed_06 | [sola.davies@mail.test]  | needs_review     | t                 | lead_seed_07 | 
+ lead_seed_13 | [tayo.adeleke@mail.test] | screening_invite | f                 | lead_seed_14 | lead_seed_13
+(2 rows)
+
+## Seed duplicates the migration misses (same person, email differs only by case/whitespace, or same phone in another format)
+      id      |         email_raw         |     phone      |      status      
+--------------+---------------------------+----------------+------------------
+ lead_seed_01 | [Kemi.Adeyemi@Mail.test ] | +2348021110001 | screening_invite
+ lead_seed_02 | [kemi.adeyemi@mail.test]  | +2348021110001 | screening_invite
+ lead_seed_03 | [femi.okafor@mail.test]   | +2348031234567 | screening_invite
+ lead_seed_04 | [femi.personal@mail.test] | 08031234567    | needs_review
+(4 rows)
+
+## Executing the migration SQL in a rolled-back transaction
+BEGIN;
+BEGIN
+DELETE FROM leads.lead_activity
+WHERE lead_id IN (
+  SELECT l1.id
+  FROM leads.leads l1
+  JOIN leads.leads l2 ON LOWER(l1.email) = LOWER(l2.email)
+  WHERE l1.created_at < l2.created_at
+);
+DELETE 2
+DELETE FROM leads.leads
+WHERE id IN (
+  SELECT l1.id
+  FROM leads.leads l1
+  JOIN leads.leads l2 ON LOWER(l1.email) = LOWER(l2.email)
+  WHERE l1.created_at < l2.created_at
+);
+ERROR:  update or delete on table "leads" violates foreign key constraint "leads_duplicate_of_fkey" on table "leads"
+DETAIL:  Key (id)=(lead_seed_13) is still referenced from table "leads".
+ROLLBACK;
+ROLLBACK
+
+## After rollback: lead count unchanged?
+14
