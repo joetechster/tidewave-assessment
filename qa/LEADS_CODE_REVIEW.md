@@ -19,7 +19,7 @@ reading, not reproduced; stated as a risk.
 | CR-03 | High | Scoring | Score of exactly 70 gets `needs_review` instead of `screening_invite` | Verified live |
 | CR-04 | Medium | Logic | Duplicate check is case/whitespace sensitive and ignores phone format | Verified live |
 | CR-05 | Medium | Validation | Non-numeric experience/hours cause 500; negative and impossible values accepted | Verified live |
-| CR-06 | Medium | Reliability | `lead.created` sent before the insert, not awaited, no outbox or retry | Code only |
+| CR-06 | Medium | Reliability | `lead.created` sent before the insert, not awaited, no outbox or retry | Verified live (n8n) |
 | CR-07 | Medium | Concurrency | Check-then-insert duplicate detection has no lock or unique constraint | Code only (race not reproduced) |
 | CR-08 | Medium | Logic | Missing template variables render as the text `undefined` | Code only (fixed in `ade4282`) |
 | CR-09 | Low | Security | Template key from the URL is joined into a file path (path traversal) | Verified live |
@@ -86,8 +86,10 @@ and does not fix the duplicate the PR describes. Details below.
   only logs delivery failures. The `leads.event_outbox` table exists in `001_init.sql` but is never written.
 - **Risk**: if the insert fails, n8n receives `lead.created` for a lead that does not exist; if n8n is down the
   event is lost with no retry (matches the brief's hint that events do not always arrive).
-- **Not reproduced**: for the CR-05 request that returned 500, no email reached Mailpit, so the downstream effect
-  was not observed. Stated as a code-level risk.
+- **Seen live (Section B)**: the CR-05 regression test (`experienceYears: "three"`, 500) still produced a signed
+  `lead.created` for a lead that was never stored; the rebuilt `street-team-lead` workflow retried `GET /leads/{id}`,
+  got 404 and skipped it (n8n execution 107 in
+  [`evidence/section-b/n8n-execution-audit.txt`](../evidence/section-b/n8n-execution-audit.txt)).
 - **Fix**: insert the lead and an outbox row in one transaction; deliver from the outbox with retries.
 
 ### CR-07 (Medium, concurrency): duplicate check is not atomic
@@ -134,7 +136,7 @@ and does not fix the duplicate the PR describes. Details below.
 ### Related observation (n8n, Section B, not leads code)
 During the CR checks the `street-team-lead` workflow emailed a score-100 test applicant
 "You're now an active Tidewave rep!" (Mailpit list in the evidence file). That breaks the "never active" rule;
-tracked for the Section B workflow fix.
+fixed in Section B (the workflow now emails screening invites only, with the template subject).
 
 ---
 

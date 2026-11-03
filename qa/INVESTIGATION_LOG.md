@@ -8,7 +8,7 @@ and proven; confirmed engine defects move to `tickets/`, workflow/config issues 
 ## F-01: Solace Avenue opt-in sends no intro email (engine events never reach n8n)
 
 **Classification**: Configuration / Section B (not filed as an engine ticket)  
-**Status**: Root cause found, fix deferred  
+**Status**: Fixed in Section B. `/__tools/reset` restores the `/webhook-test/` URL, so the Playwright `resetAll()` sets the published URL again after every reset ([`playwright/fixtures.ts`](../playwright/fixtures.ts))  
 **Persona**: ada  
 **Evidence**: [`evidence/qa/F-01-optin-events-not-delivered.txt`](../evidence/qa/F-01-optin-events-not-delivered.txt)
 
