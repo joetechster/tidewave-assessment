@@ -1,0 +1,46 @@
+# F-05 / PR12: receipts of other participants visible to ada - 2026-11-03T14:56:49Z. Logged in as ada (session cookie), plain GET.
+
+## Receipt owners (engine.payments + participants, qa_reader)
+ receipt_no |           id           |   participant    |  status   |       created_at       
+------------+------------------------+------------------+-----------+------------------------
+       1001 | pay_491695c74962913d79 | par_bayo_626179  | succeeded | 2026-10-25 14:25:24+00
+       1002 | pay_341253d5ef1e3f0c17 | par_awa_617761   | succeeded | 2026-10-28 14:25:24+00
+       1003 | pay_4a59806a94e33a6560 | par_tunde_74756e | succeeded | 2026-10-29 23:20:00+00
+       1004 | pay_60dd6a5b09391616a8 | par_zara_7a6172  | refunded  | 2026-10-15 14:25:24+00
+       1005 | pay_93512788d6d6c03174 | par_lola_6c6f6c  | succeeded | 2026-10-31 14:25:24+00
+       1006 | pay_02ab41c598822a4778 |                  | failed    | 2026-11-01 14:25:24+00
+       1007 | pay_1975042048e1686cc1 | par_ada_616461   | succeeded | 2026-11-03 14:27:21+00
+       1008 | pay_ab5ca49a4a7557b639 | par_ada_616461   | succeeded | 2026-11-03 14:30:38+00
+       1009 | pay_8ddc95eb7eea544719 |                  | failed    | 2026-11-03 14:36:59+00
+(9 rows)
+
+## GET /me/receipts/1001 as ada
+HTTP/1.1 200 OK
+X-Request-Id: req_f3e36e24c11b1e6188
+Receipt #1001 Harmattan Sessions Backer Bayo Adeleke bayo.adeleke@example.test Date 25 Oct 2026, 14:25 Backing ₦6,000.00 Fee ₦150.00 Charged ₦6,150.00 Status succeeded Reference pay_491695c74962913d79 
+
+## GET /me/receipts/1002 as ada
+HTTP/1.1 200 OK
+X-Request-Id: req_8cdfcfde46d64add98
+Receipt #1002 Harmattan Sessions Backer Awa Diallo awa.diallo@example.test Date 28 Oct 2026, 14:25 Backing CFA 6,500 Fee CFA 163 Charged CFA 6,663 Status succeeded Reference pay_341253d5ef1e3f0c17 
+
+## GET /me/receipts/1003 as ada
+HTTP/1.1 200 OK
+X-Request-Id: req_dbeb39c180a0a26455
+Receipt #1003 Harmattan Sessions Backer Tunde Bakare tunde.bakare@example.test Date 29 Oct 2026, 23:20 Backing ₦10,000.00 Fee ₦250.00 Charged ₦10,250.00 Status succeeded Reference pay_4a59806a94e33a6560 
+
+## GET /me/receipts/1004 as ada
+HTTP/1.1 200 OK
+X-Request-Id: req_e4337e9c1f9a1c2292
+Receipt #1004 Harmattan Sessions Backer Zara Okafor zara.okafor@example.test Date 15 Oct 2026, 14:25 Backing ₦12,000.00 Fee ₦300.00 Charged ₦12,300.00 Status refunded Reference pay_60dd6a5b09391616a8 
+
+## GET /me/receipts/1005 as ada
+HTTP/1.1 200 OK
+X-Request-Id: req_973a29736f918baae3
+Receipt #1005 Harmattan Sessions Backer Lola Peters lola.peters@example.test Date 31 Oct 2026, 14:25 Backing ₦10,000.00 Fee ₦250.00 Charged ₦10,250.00 Status succeeded Reference pay_93512788d6d6c03174 
+
+## GET /me/receipts/1006 as ada
+HTTP/1.1 200 OK
+X-Request-Id: req_7eab0cddd2a46880bc
+Receipt #1006 Harmattan Sessions Backer Dayo Cole dayo.cole@example.test Date 1 Nov 2026, 14:25 Backing $6.89 Fee $0.18 Charged $7.07 Status failed Reference pay_02ab41c598822a4778 
+

@@ -153,7 +153,7 @@ through. You have not been charged." Matches PR4.
 | F-01c | `source` differs by page: artist page → `"Artist"`, campaign page (`from=campaign`) → `"artist"`. The campaign-page opt-in is labelled as artist source, and casing is inconsistent. Workflow node "Route Source" compares case-sensitively to `"artist"`, so artist-page events route to the street-team fallback template. | Check `/api/docs` for the documented `source` values. | Section B fix (normalise in workflow); engine ticket if docs define different values |
 | F-01d | Same email opted in 3 times; all accepted, each with its own event. | Product notes don't say whether repeat opt-ins are rejected. | Test plan ambiguity question; Section B dedup must handle it |
 | F-01e | Every event payload has `"sequence": 1`. | Check `/api/docs` for what `sequence` means (per-entity ordering vs global). | Possibly ticket, otherwise note |
-| F-05 | Receipts are sequential numbers (`/me/receipts/1007`). | As ada, open `/me/receipts/1001` … `1006` (other personas' receipts). Any 200 showing another person's receipt breaks PR12. | Ticket if another persona's receipt is visible |
+| F-05 | Receipts are sequential numbers (`/me/receipts/1007`). | **Done 14:56Z**: as ada, receipts 1001-1006 (Bayo, Awa, Tunde, Zara, Lola, Dayo) all returned 200 with name and email. | **Filed as [TW-005](../tickets/TW-005-receipts-visible-to-other-participants.md)** (PR12) |
 
 ---
 
