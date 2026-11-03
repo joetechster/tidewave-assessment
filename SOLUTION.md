@@ -21,7 +21,26 @@
 - **Leads service**: full source read plus live checks against `:7081`; PR-17's migration was executed inside
   `BEGIN … ROLLBACK` so nothing was changed. See [`qa/LEADS_CODE_REVIEW.md`](qa/LEADS_CODE_REVIEW.md).
 
-### Sections A, B, D
+### Section D: Emails & Staff Test Screen
+- **Templates** (`templates/street-team-prospect.html`, `templates/solace-intro.html`): 600px table layout with a
+  `max-width:600px` media query, inline styles for mail clients, a hidden preheader, a CTA button plus a plain-link
+  fallback, the brief's disclaimers, and an unsubscribe link. Every variable has a `{{#if}}` fallback (e.g.
+  "Hello there,", default campaign/screening links). The site has no unsubscribe page, so I added an optional
+  `unsubscribeUrl` variable; it falls back to `mailto:unsubscribe@tidewave.test` (stays inside the test domain).
+- **Renderer** (`leads-service/src/templates.ts`): fallbacks could not work because missing variables rendered as the
+  text `undefined` (CR-08). Declared variables are now normalised to strings, `*Url` variables only accept
+  `http(s):`/`mailto:` (a `javascript:` link falls back to the default), and the plain-text part no longer includes
+  `<head>`/CSS. Handlebars `{{ }}` already HTML-escapes values.
+- **Staff screen** (`ops-console/src/app/messages/test/page.tsx`): dropdown filtered to `status === 'approved'`; one
+  input per template variable with its label, a required marker (`aria-required`) and `e.g. <example>` placeholder;
+  a debounced preview through the existing render route into `<iframe sandbox="" srcdoc>` with a 375px toggle;
+  "Send TEST run" posts plain fields (no JSON); the result shows beside the button ("Sent. … delivered to
+  staff-test@tidewave.test." or "Not sent. …") and clears once the form is edited.
+- **Defence in depth**: the API route (`ops-console/src/app/api/messages/test-run/route.ts`) re-checks on the server
+  (approved template, required fields, only declared variables forwarded), and the `staff-test-run` workflow
+  hard-codes the recipient. It previously used `variables.email` when supplied.
+
+### Sections A, B
 _TODO (candidate)._
 
 ---
@@ -32,6 +51,7 @@ _TODO (candidate)._
 |---|---|---|---|---|
 | Claude Opus 5.5 (Claude Code, with Claude in Chrome) | Section C: bug hunt (F-04 to F-08), tickets TW-003 to TW-006 | Run FakePay webhook replay, return-URL, decline and receipt tests in the browser and via `qa_reader`; draft tickets from the evidence | _TODO (candidate)_ | _TODO (candidate)_ |
 | Claude Opus 5.5 (Claude Code) | Section C: leads code review, PR-17 review, test plan | Review `leads-service/` and PR-17, verify findings against the running service, dry-run the migration, draft the review and test plan | _TODO (candidate)_ | _TODO (candidate)_ |
+| Claude Opus 5.5 (Claude Code, with Claude in Chrome) | Section D: both email templates, renderer fix, `/messages/test` screen, test-run API checks, `staff-test-run` recipient lock, Playwright Section D specs | "Clean up section D … keep going until the score is acceptable"; then "score section D and fix everything causing a low score" | _TODO (candidate)_ | _TODO (candidate)_ |
 | | | | | |
 
 ---
@@ -43,12 +63,12 @@ _TODO (candidate)._
 | Playwright Suite (Section A) | _TODO_ | | |
 | Lead Creation Workflow (Section B) | _TODO_ | | During CR checks it emailed a score-100 applicant "You're now an active Tidewave rep!" ([evidence](evidence/qa/leads/CR-live-checks.txt)) |
 | Solace Events Workflow (Section B) | _TODO_ | [F-01 evidence](evidence/qa/F-01-optin-events-not-delivered.txt) | Engine events go to `/webhook-test/` and get 404 (F-01, configuration) |
-| Staff Test Run Workflow (Section B) | _TODO_ | | |
+| Staff Test Run Workflow (Section B) | _TODO_ | [API spec](playwright/tests/api/templates.spec.ts) | Recipient locked to `staff-test@tidewave.test` in `f9a6b82`; a supplied `variables.email` is ignored (checked in Mailpit) |
 | Engine Bug Findings (Section C) | FAIL (6 tickets) | [`tickets/`](tickets/), [`qa/INVESTIGATION_LOG.md`](qa/INVESTIGATION_LOG.md) | Breakdown below |
 | Leads Service Review & PR-17 (Section C) | FAIL (7 verified findings; PR-17: request changes) | [`qa/LEADS_CODE_REVIEW.md`](qa/LEADS_CODE_REVIEW.md) | Breakdown below |
-| Street Team Email Template (Section D) | _TODO_ | | |
-| Solace Intro Email Template (Section D) | _TODO_ | | |
-| Ops Console Test Screen (Section D) | _TODO_ | | |
+| Street Team Email Template (Section D) | PASS | [API spec](playwright/tests/api/templates.spec.ts), [375px spec](playwright/tests/ops/messages-test.spec.ts), [375px screenshot](evidence/section-d/D-street-team-prospect-375-playwright.png), [Mailpit](evidence/section-d/D-mailpit-staff-test-inbox.jpg) | Brief must-include / must-not-say asserted; no horizontal scroll at 375px |
+| Solace Intro Email Template (Section D) | PASS | [API spec](playwright/tests/api/templates.spec.ts), [375px spec](playwright/tests/ops/messages-test.spec.ts), [375px screenshot](evidence/section-d/D-solace-intro-375-playwright.png), [preview](evidence/section-d/D-solace-intro-mobile-375-preview.jpg) | Copy no longer promises previews (campaign page has no audio) |
+| Ops Console Test Screen (Section D) | PASS | [ops spec](playwright/tests/ops/messages-test.spec.ts), [Mailpit](evidence/section-d/D-mailpit-staff-test-inbox.jpg) | Double-click sends one email; drafts/missing fields/anonymous rejected by the API |
 
 ### Section C traceability
 
@@ -91,5 +111,15 @@ _TODO (candidate)._
 - Code-only leads findings (CR-06, CR-07, CR-08, CR-11 to CR-14) are risks, not reproduced defects.
 - Regression tests for the leads defects belong in the Section A suite (`api` project) and reference CR-01 to CR-05.
 
-### Sections A, B, D
+### Section D
+- Unsubscribe is a `mailto:` fallback because neither the engine nor the leads service has an unsubscribe endpoint;
+  a real flow needs a signed per-recipient URL and a suppression list checked by the workflows.
+- `solace-confirmed` (approved, used by Section B) was not restyled; it is outside the two briefs.
+- The render API still renders draft templates (CR-10). The screen and the test-run API block drafts from being
+  sent, but the render endpoint itself is unchanged.
+- Timing: the send assertion allows 20s (n8n render + SMTP, plus first-request compiles under `next dev`), Mailpit
+  is polled for up to 15s, and the duplicate check waits 3s after the first email arrives. The ops spec passed
+  3 runs in a row. Run with `PW_CHANNEL=chrome` if the bundled headless shell is not installed.
+
+### Sections A, B
 _TODO (candidate)._
