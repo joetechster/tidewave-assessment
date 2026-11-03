@@ -55,7 +55,7 @@ Also reproduced from the campaign page "Keep me posted" form (`req_218157b1a39d1
 
 ## F-02: Artist page marketing consent checkbox is pre-ticked
 
-**Classification**: Public Website defect, **confirmed**, ready to ticket  
+**Classification**: Public Website defect, **confirmed**, filed as [TW-001](../tickets/TW-001-artist-page-consent-prechecked.md)  
 **Rule broken**: PRODUCT_NOTES §3: "The marketing consent box is unticked by default."  
 **Evidence**: [`evidence/qa/F-02-F-03-optin-forms.txt`](../evidence/qa/F-02-F-03-optin-forms.txt)
 
@@ -70,7 +70,7 @@ Also reproduced from the campaign page "Keep me posted" form (`req_218157b1a39d1
 
 ## F-03: Opt-ins are attached to the closed campaign `coastline-ep`
 
-**Classification**: Engine defect, **confirmed**, ready to ticket  
+**Classification**: Engine defect, **confirmed**, filed as [TW-002](../tickets/TW-002-optin-attached-to-closed-campaign.md)  
 **Rule broken**: PRODUCT_NOTES §3 (intro email links to the campaign page the listener can back) and §4 (Harmattan Sessions is the active campaign; Coastline EP is closed)  
 **Evidence**: [`evidence/qa/F-02-F-03-optin-forms.txt`](../evidence/qa/F-02-F-03-optin-forms.txt)
 
