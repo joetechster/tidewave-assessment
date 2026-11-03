@@ -78,16 +78,26 @@ Every replay of the same `payment.succeeded` event is accepted (200) and writes 
 - Root cause hypothesis: the engine does not dedupe on the provider event id. `engine.provider_inbox` has
   no unique constraint on `event_id`, so every delivery is stored and processed as new. The credit also
   appears not to check whether a `provider_webhook` credit already exists for the payment.
-- The original `payment.succeeded` delivery at 13:50:16 did **not** credit, because the payment had
-  already been credited from the browser return URL (see F-04 in `qa/INVESTIGATION_LOG.md`). The duplicate
-  credits come from repeated deliveries of an already-received event, not from the first delivery.
+- On receipt 1007 the original `payment.succeeded` delivery at 13:50:16 did **not** credit, because the
+  payment had already been credited from the browser return URL (TW-004). The duplicate credits come from
+  repeated deliveries of an already-received event.
+- **Clean reproduction (no return URL involved)**, after `node tools/tw.mjs reset`, receipt 1007
+  `pay_1975042048e1686cc1` / `fp_12ced099ace932c0ec`: the card was submitted from the FakePay page without
+  following the redirect, so `/checkout/return` was never called. The webhooks credited once
+  (ledger id 7, `provider_webhook`, `last_sequence = 2`, total ₦2,000). Clicking **Replay** on
+  `fpevt_cc9c7693cd1749344f` (`payment.succeeded`) in the FakePay dashboard (`req_37118669c7a7dbba10`
+  → engine `req_31cfa8abf8d7da473b`, 200) added ledger id 8 (+200000, `provider_webhook`); `/me` then showed
+  "Confirmed backing: ₦4,000.00". Evidence:
+  [`F-06b-before.txt`](../evidence/qa/F-06b-before.txt),
+  [`F-06b-after-replay.txt`](../evidence/qa/F-06b-after-replay.txt),
+  [`F-06b-me-after-replay.jpg`](../evidence/qa/F-06b-me-after-replay.jpg).
+- The replay does not queue a new `engine.outbox` event, so it does not cause a duplicate email; the damage is
+  the ledger credit.
 - Out-of-order replay is handled safely: replaying the older `payment.processing` event (seq 1) after
   success left `payments.status = succeeded` and the ledger unchanged (`req_a31110982df2c2085c`,
   [`evidence/qa/F-06-after-processing.txt`](../evidence/qa/F-06-after-processing.txt)).
-- `payments.last_sequence` stays `0` throughout, even after seq 2 is processed, so it cannot currently be
-  used to reject stale or repeated events.
-- Not verified: whether a clean run (webhook-only credit, no return URL) also double-credits on replay.
-  Suggested retest after `node tools/tw.mjs reset`: pay, close the tab before `/checkout/return`, let the
-  webhook credit, then replay `payment.succeeded`.
-- Not claimed: the campaign page shows "₦2,000.00 of ₦10,000.00 toward the next level" while `/me` shows
-  ₦6,000; the two pages may calculate differently.
+- `payments.last_sequence` is updated when webhooks drive the payment (2 in the clean run) but stays `0` when
+  the return URL marked it succeeded first.
+- Not claimed: the campaign page progress line stays at "₦2,000.00 of ₦10,000.00 toward the next level" while
+  `/me` shows the inflated total ([`F-06b-campaign-after-replay.jpg`](../evidence/qa/F-06b-campaign-after-replay.jpg));
+  the two pages calculate differently and it is not yet clear which is intended.

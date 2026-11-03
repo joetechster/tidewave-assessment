@@ -1,0 +1,63 @@
+# F-06b AFTER Replay of fpevt_cc9c7693cd1749344f (payment.succeeded) clicked in FakePay dashboard - 2026-11-03T14:29:08Z as qa_reader. Clean run after reset: browser never visited /checkout/return.
+## Payment
+           id           | receipt_no |  status   | last_sequence |       updated_at       
+------------------------+------------+-----------+---------------+------------------------
+ pay_1975042048e1686cc1 |       1007 | succeeded |             2 | 2026-11-03 14:27:46+00
+(1 row)
+
+## Ledger
+ id |  kind  |  kobo  |      source      |       created_at       
+----+--------+--------+------------------+------------------------
+  7 | credit | 200000 | provider_webhook | 2026-11-03 14:27:46+00
+  8 | credit | 200000 | provider_webhook | 2026-11-03 14:28:51+00
+(2 rows)
+
+## Provider inbox
+ id |         event_id         |        type        | sequence |      received_at       | signature_ok 
+----+--------------------------+--------------------+----------+------------------------+--------------
+  1 | fpevt_c2e4c247a30477e019 | payment.processing |        1 | 2026-11-03 14:27:45+00 | t
+  2 | fpevt_cc9c7693cd1749344f | payment.succeeded  |        2 | 2026-11-03 14:27:46+00 | t
+  3 | fpevt_cc9c7693cd1749344f | payment.succeeded  |        2 | 2026-11-03 14:28:51+00 | t
+(3 rows)
+
+## FakePay events
+            id            |        type        |   status   | sequence |      delivered_at      
+--------------------------+--------------------+------------+----------+------------------------
+ fpevt_c2e4c247a30477e019 | payment.processing | processing |        1 | 2026-11-03 14:27:45+00
+ fpevt_cc9c7693cd1749344f | payment.succeeded  | succeeded  |        2 | 2026-11-03 14:28:51+00
+(2 rows)
+
+## Request log since payment
+              ts               |       request_id       | method |                       path                        | status |      actor      
+-------------------------------+------------------------+--------+---------------------------------------------------+--------+-----------------
+ 2026-11-03 14:27:12.879496+00 | req_2ea6789f8173358c50 | POST   | /checkout/quote                                   |    200 | participant:ada
+ 2026-11-03 14:27:21.917265+00 | req_082a5c1c6ef4d8192c | POST   | /checkout/pay                                     |    303 | participant:ada
+ 2026-11-03 14:27:21.929753+00 | req_e513aa9f5ce3164523 | GET    | /pay/fp_12ced099ace932c0ec                        |    200 | participant:ada
+ 2026-11-03 14:27:44.807838+00 | req_85fb3f5cca498c0026 | POST   | /pay/fp_12ced099ace932c0ec                        |    303 | participant:ada
+ 2026-11-03 14:27:45.518385+00 | req_accb9394979c88b505 | POST   | /webhooks/fakepay                                 |    200 | fakepay
+ 2026-11-03 14:27:46.255428+00 | req_fab0b5afc2d055238b | POST   | /webhooks/fakepay                                 |    200 | fakepay
+ 2026-11-03 14:28:11.48187+00  | req_aed780fd702771813a | GET    | /v1/payments/fp_12ced099ace932c0ec                |    200 | anonymous
+ 2026-11-03 14:28:15.23769+00  | req_2b0fa96e2a8cb93826 | GET    | /dashboard                                        |    200 | participant:ada
+ 2026-11-03 14:28:51.886432+00 | req_31cfa8abf8d7da473b | POST   | /webhooks/fakepay                                 |    200 | fakepay
+ 2026-11-03 14:28:51.899116+00 | req_37118669c7a7dbba10 | POST   | /dashboard/events/fpevt_cc9c7693cd1749344f/replay |    303 | participant:ada
+ 2026-11-03 14:28:51.916783+00 | req_1fac56e6d31caa82c2 | GET    | /dashboard?replayed=fpevt_cc9c7693cd1749344f      |    200 | participant:ada
+(11 rows)
+
+## Outbox
+           id           |      type       |          created_at           | last_status | delivered_at 
+------------------------+-----------------+-------------------------------+-------------+--------------
+ evt_c228a4d10bec789c91 | payment.updated | 2026-11-03 14:27:45.512152+00 | 404         | 
+ evt_3a3dbde5e1386855af | payment.updated | 2026-11-03 14:27:46.248679+00 | 404         | 
+(2 rows)
+
+## Ada ledger total (harmattan)
+ total_kobo | rows 
+------------+------
+     400000 |    2
+(1 row)
+
+## FakePay API
+{"amountMinor":210000,"currency":"NGN","merchantPaymentId":"pay_1975042048e1686cc1","ref":"fp_12ced099ace932c0ec","status":"succeeded"}
+
+## Mailpit
+"messages_count":1
