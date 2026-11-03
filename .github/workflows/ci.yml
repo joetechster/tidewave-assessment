@@ -39,15 +39,32 @@ jobs:
         env:
           COMPOSE_INTER_CONTAINER_COMMUNICATION: true
 
-      - name: Wait for services and verify environment
-        run: |
-          node tools/tw.mjs setup-check
-
       - name: Install Playwright test dependencies
         working-directory: ./playwright
         run: |
           npm ci
           npx playwright install --with-deps chromium
+
+      - name: Start ops console
+        working-directory: ./ops-console
+        run: |
+          npm ci
+          cp .env.local.example .env.local
+          nohup npm run dev > ops-console.log 2>&1 &
+
+      - name: Wait for services and verify environment
+        run: |
+          # n8n imports and publishes its workflows on first start (about 3 minutes), so poll instead of checking once.
+          for i in $(seq 1 36); do
+            if node tools/tw.mjs setup-check > /dev/null && curl -sf -o /dev/null http://localhost:7300/login; then
+              node tools/tw.mjs setup-check
+              exit 0
+            fi
+            sleep 10
+          done
+          node tools/tw.mjs setup-check
+          echo "--- ops console log ---"; tail -50 ops-console/ops-console.log
+          exit 1
 
       - name: Run Playwright E2E Test Suite (Positive & Negative Cases)
         working-directory: ./playwright
