@@ -1,33 +1,10 @@
-import { test, expect, Page } from '@playwright/test';
-import { auth, loginAs, resetAll } from '../../fixtures';
+import { test, expect } from '@playwright/test';
+import { auth, loginAs, payWithCard, resetAll, startListenerBacking } from '../../fixtures';
 
 // Each test starts from seed data so ada is a new backer with nothing confirmed.
 test.beforeEach(async () => {
   await resetAll();
 });
-
-/** From the campaign checkout, quote the Listener level and land on the FakePay page. */
-async function startListenerBacking(page: Page) {
-  await page.goto('/checkout?campaign=harmattan-sessions');
-  await page.getByRole('button', { name: /Become a Listener/ }).click();
-  await page.getByRole('checkbox', { name: /backing is voluntary/ }).check();
-  await page.getByRole('button', { name: 'Review backing' }).click();
-
-  await expect(page.getByRole('heading', { name: 'Review your backing' })).toBeVisible();
-  await expect(page.getByRole('row', { name: /Fee \(2\.5%\)/ })).toContainText('₦100.00');
-  await expect(page.getByRole('row', { name: /Total to pay/ })).toContainText('₦2,100.00');
-  await page.getByRole('button', { name: 'Pay with FakePay' }).click();
-
-  await page.waitForURL(/localhost:7090\/pay\/fp_/);
-  return new URL(page.url()).pathname.split('/').pop()!;
-}
-
-async function payWithCard(page: Page, card: string) {
-  await page.getByLabel('Card number').fill(card);
-  await page.getByLabel('Expiry').fill('12/30');
-  await page.getByLabel('CVC').fill('123');
-  await page.getByRole('button', { name: /^Pay / }).click();
-}
 
 test.describe('persona account', () => {
   test('ada signs in and sees her account on /me', async ({ page }) => {
