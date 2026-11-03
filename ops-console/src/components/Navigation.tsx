@@ -2,18 +2,21 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 export default function Navigation() {
   const [role, setRole] = useState<string | null>(null);
   const router = useRouter();
+  const pathname = usePathname();
 
+  // The layout (and this nav) survives client-side navigation, so re-read the
+  // session on route change; otherwise it keeps the signed-out state after login.
   useEffect(() => {
     fetch('/api/auth/me')
       .then((res) => res.json())
       .then((data) => setRole(data.role))
       .catch(() => setRole(null));
-  }, []);
+  }, [pathname]);
 
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
