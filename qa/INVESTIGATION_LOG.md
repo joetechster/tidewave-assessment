@@ -90,11 +90,14 @@ Screenshots: [`F-02-artist-page-consent-prechecked.png`](../evidence/qa/F-02-art
 
 ---
 
-## F-04: Backing is credited from the browser return URL, before FakePay confirms (suspected, needs negative repro)
+## F-04: Backing is credited from the browser return URL, before FakePay confirms
 
-**Classification**: Engine, **suspected Critical**, NOT yet a ticket  
-**Rules at risk**: PR4 (counts only when FakePay confirms `succeeded`), PR14 ("You're in" only after confirmation)  
-**Evidence**: [`evidence/qa/F-04-credit-from-return-url.txt`](../evidence/qa/F-04-credit-from-return-url.txt)
+**Classification**: Engine, **confirmed Critical**, filed as [TW-004](../tickets/TW-004-backing-credited-from-return-url.md)  
+**Rules broken**: PR4 (counts only when FakePay confirms `succeeded`), PR14 ("You're in" only after confirmation)  
+**Evidence**: [`evidence/qa/F-04-credit-from-return-url.txt`](../evidence/qa/F-04-credit-from-return-url.txt),
+[`F-04b-before.txt`](../evidence/qa/F-04b-before.txt), [`F-04b-after-forged-return.txt`](../evidence/qa/F-04b-after-forged-return.txt),
+[`F-04b-youre-in-unpaid.jpg`](../evidence/qa/F-04b-youre-in-unpaid.jpg),
+[`F-04b-declined-then-forged-return.txt`](../evidence/qa/F-04b-declined-then-forged-return.txt)
 
 Happy-path payment by ada (NGN ₦2,000, receipt 1007, `pay_4fbfe9ba34d4782759` / `fp_760b3b2c6af26f5f40`):
 
@@ -119,6 +122,14 @@ Amounts on this payment look correct: amount ₦2,000, fee ₦100 (2.5% = ₦50 
    `select * from engine.ledger where payment_id='<pay_id>'` has a credit? `engine.payments.status`?
    `engine.fp_payments.status` for the ref (truth from FakePay)?
 If credited without a FakePay `succeeded` → Critical ticket (PR4/PR14). If not → drop F-04.
+
+**Negative repro result (14:30-14:33Z, after reset, in Chrome as ada)**: `pay_ab5ca49a4a7557b639` /
+`fp_66ff01ac3d9098f54a`, card never submitted. Opening the return URL by hand (`req_717dac551b1427073b`)
+showed "You're in! … Level unlocked: Listener", set `payments.status = succeeded`, wrote ledger id 9
+(200000, `return_url`) and queued `payment.updated` `succeeded`. FakePay still says `created`. **Confirmed.**
+
+Variant: declined card (`pay_8ddc95eb7eea544719`, FakePay `failed`, webhook already received) then forged
+`status=success` return: no credit and status stays `failed`, but the page still says "You're in!" (PR14).
 
 ---
 
