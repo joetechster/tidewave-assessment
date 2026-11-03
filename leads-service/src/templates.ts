@@ -69,6 +69,19 @@ export function listTemplates(): TemplateItem[] {
   }
 }
 
+const SAFE_URL = /^(https?:\/\/|mailto:)/i;
+
+function safeValue(name: string, value: unknown): string {
+  if (typeof value !== 'string' && typeof value !== 'number' && typeof value !== 'boolean') {
+    return '';
+  }
+  const str = String(value).trim();
+  if (/url$/i.test(name) && !SAFE_URL.test(str)) {
+    return '';
+  }
+  return str;
+}
+
 export function renderTemplate(
   key: string,
   variables: Record<string, any> = {},
@@ -86,13 +99,12 @@ export function renderTemplate(
   const meta: TemplateMetadata = JSON.parse(metaRaw);
   const htmlRaw = fs.readFileSync(htmlPath, 'utf-8');
 
+  // Declared variables are normalised so templates can rely on {{#if}} fallbacks:
+  // missing/blank/non-scalar values become '' and URL variables only accept safe schemes.
   const renderContext: Record<string, any> = {};
   if (meta.variables && Array.isArray(meta.variables)) {
     for (const v of meta.variables) {
-      renderContext[v.name] =
-        variables && variables[v.name] !== undefined
-          ? variables[v.name]
-          : '' + variables[v.name];
+      renderContext[v.name] = safeValue(v.name, variables?.[v.name]);
     }
   }
 
@@ -113,7 +125,12 @@ export function renderTemplate(
 
   const html = htmlTemplate(renderContext);
   // Plain text fallback by stripping html tags
-  const text = html.replace(/<[^>]*>?/gm, '').replace(/\s+/g, ' ').trim();
+  const text = html
+    .replace(/<head[\s\S]*?<\/head>/i, '')
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/<[^>]*>?/gm, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 
   return {
     subject,
