@@ -1,7 +1,7 @@
 # Solution Submission
 
 **Candidate Name**: Joseph Bamidele  
-**Repository URL**:  
+**Repository URL**: https://github.com/joetechster/tidewave-assessment  
 **Submission Date**: 2026-11-03  
 
 ---
