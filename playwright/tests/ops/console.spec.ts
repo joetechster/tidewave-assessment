@@ -1,8 +1,14 @@
 import { test, expect } from '@playwright/test';
 import { auth, ENGINE_URL, opsLogin, resetAll } from '../../fixtures';
 
-test.beforeAll(async () => {
+test.beforeAll(async ({ request }) => {
+  test.setTimeout(120_000);
   await resetAll();
+  // `next dev` compiles each route on first hit (10-20 s cold). Warm them up front
+  // so test assertions measure the console, not the compiler.
+  for (const route of ['/login', '/leads', '/leads/lead_seed_10', '/payments']) {
+    await request.get(route, { timeout: 90_000 });
+  }
 });
 
 test.describe('Admin', () => {
@@ -16,7 +22,7 @@ test.describe('Admin', () => {
     await expect(page.getByText(/Page 1 of \d+ \(\d+ total leads\)/)).toBeVisible();
 
     const rows = page.locator('table.data-table tbody tr');
-    expect(await rows.count()).toBeGreaterThan(1);
+    await expect(rows.nth(1)).toBeVisible();
 
     await page.getByPlaceholder('Search leads by name, email, or city...').fill('Folake');
     await expect(rows).toHaveCount(1);
@@ -37,6 +43,7 @@ test.describe('Admin', () => {
 
   test('views payments and can refund succeeded ones', async ({ page }) => {
     await page.getByRole('link', { name: 'Payments' }).click();
+    await page.waitForURL('**/payments');
     await expect(page.getByRole('heading', { name: 'Backing Payments' })).toBeVisible();
 
     const succeeded = page.locator('tbody tr', { has: page.locator('.badge', { hasText: /^succeeded$/ }) });
@@ -53,9 +60,10 @@ test.describe('Viewer', () => {
 
   test('can browse leads and payments read-only', async ({ page }) => {
     await expect(page.getByLabel('Role indicator')).toHaveText('Role: Viewer');
-    expect(await page.locator('table.data-table tbody tr').count()).toBeGreaterThan(1);
+    await expect(page.locator('table.data-table tbody tr').nth(1)).toBeVisible();
 
     await page.getByRole('link', { name: 'Payments' }).click();
+    await page.waitForURL('**/payments');
     await expect(page.getByRole('heading', { name: 'Backing Payments' })).toBeVisible();
     await expect(page.getByText('Admin only').first()).toBeVisible();
     await expect(page.getByRole('button', { name: 'Refund' })).toHaveCount(0);
