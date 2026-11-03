@@ -1,0 +1,243 @@
+# n8n execution audit - 2026-11-03T16:07:22Z
+# id  start(UTC)  status  duration  -> final node (each execution's full node path is in n8n > Executions)
+
+## wf_solace_events
+53 15:51:16 success 1.084s -> Intro Sent 
+54 15:51:18 success 1.883s -> Intro Already Sent 
+55 15:51:20 success 0.372s -> Skip Intro 
+56 15:51:21 success 0.231s -> Reject Unsigned (401) 
+57 15:51:35 success 0.6s -> Confirmation Sent 
+58 15:52:00 success 0.333s -> Confirmation Already Sent 
+59 15:52:00 success 8.504s -> Engine Unavailable (503) 
+61 15:54:23 success 9.434s -> Skip Unknown Payment 
+62 15:57:28 success 0.883s -> Confirmation Sent 
+63 15:57:29 success 0.572s -> Confirmation Already Sent 
+64 15:57:29 success 0.806s -> Confirmation Already Sent 
+65 15:57:36 success 0.276s -> No Confirmation Yet 
+66 15:57:43 success 4.932s -> Confirmation Sent 
+67 15:57:55 success 8.565s -> Engine Unavailable (503) 
+68 15:58:07 success 2.86s -> Confirmation Sent 
+69 15:58:19 success 5.792s -> Confirmation Sent 
+70 15:58:31 success 0.842s -> Confirmation Already Sent 
+71 15:58:34 success 1.387s -> Intro Sent 
+72 15:58:37 success 0.311s -> Intro Already Sent 
+73 15:58:43 success 0.657s -> Skip Intro 
+75 16:00:01 success 0.158s -> Reject Unsigned (401) 
+76 16:00:01 success 0.15s -> Reject Unsigned (401) 
+86 16:00:49 success 0.55s -> Confirmation Sent 
+87 16:00:50 success 0.811s -> Confirmation Already Sent 
+88 16:00:50 success 0.912s -> Confirmation Already Sent 
+89 16:00:57 success 0.704s -> No Confirmation Yet 
+90 16:01:04 success 4.793s -> Confirmation Sent 
+91 16:01:16 success 9.071s -> Engine Unavailable (503) 
+92 16:01:28 success 2.836s -> Confirmation Sent 
+93 16:01:43 success 5.556s -> Confirmation Sent 
+94 16:01:55 success 1.435s -> Confirmation Already Sent 
+95 16:02:01 success 1.22s -> Intro Sent 
+96 16:02:04 success 0.664s -> Intro Already Sent 
+97 16:02:10 success 0.304s -> Skip Intro 
+98 16:02:34 success 0.293s -> No Confirmation Yet 
+99 16:02:58 success 1.084s -> Intro Sent 
+113 16:05:03 success 0.127s -> Reject Unsigned (401) 
+114 16:05:03 success 0.128s -> Reject Unsigned (401) 
+
+## wf_street_team_lead
+77 16:00:02 success 0.145s -> Reject Unsigned (401) 
+78 16:00:02 success 0.231s -> Reject Unsigned (401) 
+79 16:00:02 success 1.407s -> Follow-up Sent 
+80 16:00:04 success 0.391s -> Follow-up Already Sent 
+81 16:00:09 success 0.57s -> Skip Follow-up 
+82 16:00:13 success 0.327s -> Skip Follow-up 
+83 16:00:13 success 0.419s -> Skip Follow-up 
+101 16:04:44 success 2.162s -> Follow-up Sent 
+102 16:04:44 success 1.471s -> Skip Follow-up 
+103 16:04:46 success 0.584s -> Skip Follow-up 
+104 16:04:46 success 0.807s -> Skip Follow-up 
+105 16:04:49 success 0.92s -> Skip Follow-up 
+106 16:04:49 success 1.053s -> Skip Follow-up 
+107 16:04:51 success 8.869s -> Skip Unknown Lead 
+108 16:04:53 success 0.442s -> Skip Follow-up 
+109 16:04:55 success 0.97s -> Skip Follow-up 
+110 16:04:56 success 0.51s -> Skip Follow-up 
+111 16:04:57 success 0.315s -> Skip Follow-up 
+115 16:05:03 success 0.141s -> Reject Unsigned (401) 
+116 16:05:03 success 0.202s -> Reject Unsigned (401) 
+117 16:05:03 success 1.46s -> Follow-up Sent 
+118 16:05:06 success 0.336s -> Follow-up Already Sent 
+119 16:05:10 success 0.297s -> Skip Follow-up 
+120 16:05:14 success 0.927s -> Skip Follow-up 
+121 16:05:14 success 1.01s -> Skip Follow-up 
+
+## wf_staff_test_run
+60 15:54:23 success 0.454s -> Reject Test Run (400) 
+74 16:00:01 success 0.37s -> Test Run Sent 
+84 16:00:16 success 0.199s -> Reject Test Run (400) 
+85 16:00:16 success 0.152s -> Reject Test Run (400) 
+100 16:04:29 success 0.449s -> Test Run Sent 
+112 16:05:02 success 0.327s -> Test Run Sent 
+122 16:05:18 success 0.119s -> Reject Test Run (400) 
+123 16:05:18 success 0.122s -> Reject Test Run (400) 
+
+# Step-by-step node paths for the recovery and idempotency cases
+
+### execution 62 (Solace Avenue Events) - confirmed backing sent
+  15:57:28.290  Webhook                              1 ms  success  out=[1]
+  15:57:28.333  Read Signed Payload                 49 ms  success  out=[1]
+  15:57:28.400  Compute HMAC                        21 ms  success  out=[1]
+  15:57:28.433  Check Signature                     15 ms  success  out=[1]
+  15:57:28.459  Signature Valid?                     2 ms  success  out=[1,0]
+  15:57:28.472  Route Event Type                     7 ms  success  out=[0,1,0]
+  15:57:28.490  Read Payment Event                  10 ms  success  out=[1]
+  15:57:28.510  Payment Id Valid?                   10 ms  success  out=[1,0]
+  15:57:28.546  Verify Payment With Engine          41 ms  success  out=[1,0]
+  15:57:28.599  Engine Confirms Succeeded?          12 ms  success  out=[1,0]
+  15:57:28.624  Prepare Confirmation                21 ms  success  out=[1]
+  15:57:28.662  Claim Confirmation Email            18 ms  success  out=[1,0]
+  15:57:28.695  Confirmation Not Sent Before?       30 ms  success  out=[1,0]
+  15:57:28.739  Render Solace Confirmed             48 ms  success  out=[1,0]
+  15:57:28.801  Send Confirmed Email               135 ms  success  out=[1,0]
+  15:57:28.985  Record Engine Activity              39 ms  success  out=[1]
+  15:57:29.038  Confirmation Sent                   17 ms  success  out=[1]
+
+### execution 63 (Solace Avenue Events) - engine redelivery of same event - duplicate
+  15:57:29.555  Webhook                              0 ms  success  out=[1]
+  15:57:29.582  Read Signed Payload                 19 ms  success  out=[1]
+  15:57:29.619  Compute HMAC                        14 ms  success  out=[1]
+  15:57:29.646  Check Signature                     20 ms  success  out=[1]
+  15:57:29.677  Signature Valid?                     3 ms  success  out=[1,0]
+  15:57:29.695  Route Event Type                     7 ms  success  out=[0,1,0]
+  15:57:29.724  Read Payment Event                  12 ms  success  out=[1]
+  15:57:29.765  Payment Id Valid?                    3 ms  success  out=[1,0]
+  15:57:29.794  Verify Payment With Engine          34 ms  success  out=[1,0]
+  15:57:29.858  Engine Confirms Succeeded?           2 ms  success  out=[1,0]
+  15:57:29.894  Prepare Confirmation                13 ms  success  out=[1]
+  15:57:29.929  Claim Confirmation Email            48 ms  success  out=[1,1]
+  15:57:29.996  Confirmation Not Sent Before?        4 ms  success  out=[0,1]
+  15:57:30.025  Confirmation Already Sent           16 ms  success  out=[1]
+
+### execution 65 (Solace Avenue Events) - signed event claims succeeded for unpaid payment
+  15:57:36.344  Webhook                              0 ms  success  out=[1]
+  15:57:36.357  Read Signed Payload                 12 ms  success  out=[1]
+  15:57:36.384  Compute HMAC                        12 ms  success  out=[1]
+  15:57:36.408  Check Signature                     10 ms  success  out=[1]
+  15:57:36.442  Signature Valid?                     4 ms  success  out=[1,0]
+  15:57:36.461  Route Event Type                     8 ms  success  out=[0,1,0]
+  15:57:36.481  Read Payment Event                   9 ms  success  out=[1]
+  15:57:36.500  Payment Id Valid?                    2 ms  success  out=[1,0]
+  15:57:36.516  Verify Payment With Engine          29 ms  success  out=[1,0]
+  15:57:36.559  Engine Confirms Succeeded?           3 ms  success  out=[0,1]
+  15:57:36.571  No Confirmation Yet                 15 ms  success  out=[1]
+
+### execution 66 (Solace Avenue Events) - engine 503 x2 recovered by node retries
+  15:57:43.161  Webhook                              0 ms  success  out=[1]
+  15:57:43.312  Read Signed Payload                109 ms  success  out=[1]
+  15:57:43.493  Compute HMAC                        21 ms  success  out=[1]
+  15:57:43.543  Check Signature                     13 ms  success  out=[1]
+  15:57:43.584  Signature Valid?                     4 ms  success  out=[1,0]
+  15:57:43.611  Route Event Type                    14 ms  success  out=[0,1,0]
+  15:57:43.639  Read Payment Event                   8 ms  success  out=[1]
+  15:57:43.661  Payment Id Valid?                    2 ms  success  out=[1,0]
+  15:57:43.677  Verify Payment With Engine        4129 ms  success  out=[1,0]
+  15:57:47.819  Engine Confirms Succeeded?           3 ms  success  out=[1,0]
+  15:57:47.833  Prepare Confirmation                 9 ms  success  out=[1]
+  15:57:47.855  Claim Confirmation Email            11 ms  success  out=[1,0]
+  15:57:47.877  Confirmation Not Sent Before?        3 ms  success  out=[1,0]
+  15:57:47.891  Render Solace Confirmed             22 ms  success  out=[1,0]
+  15:57:47.928  Send Confirmed Email                62 ms  success  out=[1,0]
+  15:57:48.007  Record Engine Activity              22 ms  success  out=[1]
+  15:57:48.042  Confirmation Sent                    3 ms  success  out=[1]
+
+### execution 67 (Solace Avenue Events) - engine 503 x6 - n8n answers 503, nothing claimed
+  15:57:55.173  Webhook                              0 ms  success  out=[1]
+  15:57:55.228  Read Signed Payload                 14 ms  success  out=[1]
+  15:57:55.255  Compute HMAC                        11 ms  success  out=[1]
+  15:57:55.281  Check Signature                     12 ms  success  out=[1]
+  15:57:55.311  Signature Valid?                     3 ms  success  out=[1,0]
+  15:57:55.327  Route Event Type                     5 ms  success  out=[0,1,0]
+  15:57:55.343  Read Payment Event                   8 ms  success  out=[1]
+  15:57:55.360  Payment Id Valid?                    3 ms  success  out=[1,0]
+  15:57:55.375  Verify Payment With Engine        8248 ms  success  out=[0,1]
+  15:58:03.642  Payment Unknown?                     3 ms  success  out=[0,1]
+  15:58:03.655  Engine Unavailable (503)            13 ms  success  out=[1]
+
+### execution 68 (Solace Avenue Events) - engine redelivery after 503 - sent
+  15:58:07.144  Webhook                              1 ms  success  out=[1]
+  15:58:07.157  Read Signed Payload                 11 ms  success  out=[1]
+  15:58:07.181  Compute HMAC                        10 ms  success  out=[1]
+  15:58:07.211  Check Signature                     16 ms  success  out=[1]
+  15:58:07.239  Signature Valid?                     4 ms  success  out=[1,0]
+  15:58:07.256  Route Event Type                     7 ms  success  out=[0,1,0]
+  15:58:07.276  Read Payment Event                  10 ms  success  out=[1]
+  15:58:07.326  Payment Id Valid?                    7 ms  success  out=[1,0]
+  15:58:07.352  Verify Payment With Engine        2061 ms  success  out=[1,0]
+  15:58:09.428  Engine Confirms Succeeded?           4 ms  success  out=[1,0]
+  15:58:09.445  Prepare Confirmation                69 ms  success  out=[1]
+  15:58:09.570  Claim Confirmation Email            33 ms  success  out=[1,0]
+  15:58:09.661  Confirmation Not Sent Before?        7 ms  success  out=[1,0]
+  15:58:09.690  Render Solace Confirmed            126 ms  success  out=[1,0]
+  15:58:09.837  Send Confirmed Email                69 ms  success  out=[1,0]
+  15:58:09.926  Record Engine Activity              22 ms  success  out=[1]
+  15:58:09.964  Confirmation Sent                    5 ms  success  out=[1]
+
+### execution 69 (Solace Avenue Events) - Mailpit 451 - SMTP retries then sent
+  15:58:19.344  Webhook                              1 ms  success  out=[1]
+  15:58:19.381  Read Signed Payload                 14 ms  success  out=[1]
+  15:58:19.408  Compute HMAC                        11 ms  success  out=[1]
+  15:58:19.433  Check Signature                     13 ms  success  out=[1]
+  15:58:19.459  Signature Valid?                     2 ms  success  out=[1,0]
+  15:58:19.479  Route Event Type                    20 ms  success  out=[0,1,0]
+  15:58:19.539  Read Payment Event                  23 ms  success  out=[1]
+  15:58:19.585  Payment Id Valid?                    3 ms  success  out=[1,0]
+  15:58:19.616  Verify Payment With Engine          30 ms  success  out=[1,0]
+  15:58:19.658  Engine Confirms Succeeded?           4 ms  success  out=[1,0]
+  15:58:19.679  Prepare Confirmation                11 ms  success  out=[1]
+  15:58:19.702  Claim Confirmation Email            21 ms  success  out=[1,0]
+  15:58:19.741  Confirmation Not Sent Before?        3 ms  success  out=[1,0]
+  15:58:19.765  Render Solace Confirmed            129 ms  success  out=[1,0]
+  15:58:19.910  Send Confirmed Email              5084 ms  success  out=[1,0]
+  15:58:25.015  Record Engine Activity              23 ms  success  out=[1]
+  15:58:25.051  Confirmation Sent                    5 ms  success  out=[1]
+
+### execution 70 (Solace Avenue Events) - concurrent engine redelivery during 69 - duplicate
+  15:58:31.143  Webhook                              1 ms  success  out=[1]
+  15:58:31.209  Read Signed Payload                 15 ms  success  out=[1]
+  15:58:31.248  Compute HMAC                        15 ms  success  out=[1]
+  15:58:31.280  Check Signature                     14 ms  success  out=[1]
+  15:58:31.311  Signature Valid?                     4 ms  success  out=[1,0]
+  15:58:31.333  Route Event Type                    12 ms  success  out=[0,1,0]
+  15:58:31.371  Read Payment Event                  12 ms  success  out=[1]
+  15:58:31.407  Payment Id Valid?                    5 ms  success  out=[1,0]
+  15:58:31.454  Verify Payment With Engine          62 ms  success  out=[1,0]
+  15:58:31.539  Engine Confirms Succeeded?           3 ms  success  out=[1,0]
+  15:58:31.572  Prepare Confirmation                18 ms  success  out=[1]
+  15:58:31.664  Claim Confirmation Email            18 ms  success  out=[1,1]
+  15:58:31.750  Confirmation Not Sent Before?        4 ms  success  out=[0,1]
+  15:58:31.785  Confirmation Already Sent            9 ms  success  out=[1]
+
+### execution 117 (Street Team Lead Application) - street team screening invite - sent without active wording
+  16:05:03.928  Webhook                              0 ms  success  out=[1]
+  16:05:03.965  Read Signed Payload                 16 ms  success  out=[1]
+  16:05:04.031  Compute HMAC                        37 ms  success  out=[1]
+  16:05:04.131  Check Signature                     11 ms  success  out=[1]
+  16:05:04.302  Signature Valid?                     7 ms  success  out=[1,0]
+  16:05:04.345  Is lead.created?                     3 ms  success  out=[1,0]
+  16:05:04.381  Get Lead                            38 ms  success  out=[1,0]
+  16:05:04.480  Plan Follow-up                      14 ms  success  out=[1]
+  16:05:04.511  Follow-up Allowed?                   4 ms  success  out=[1,0]
+  16:05:04.531  Claim Follow-up Email               62 ms  success  out=[1,0]
+  16:05:04.626  Follow-up Not Sent Before?           3 ms  success  out=[1,0]
+  16:05:04.698  Render Street Team Prospect        222 ms  success  out=[1,0]
+  16:05:04.961  Send Follow-up Email               100 ms  success  out=[1,0]
+  16:05:05.134  Record Lead Activity               117 ms  success  out=[1]
+  16:05:05.305  Follow-up Sent                       5 ms  success  out=[1]
+
+### execution 107 (Street Team Lead Application) - lead.created for a lead never inserted (CR-06) - skipped
+  16:04:51.286  Webhook                              1 ms  success  out=[1]
+  16:04:51.306  Read Signed Payload                 29 ms  success  out=[1]
+  16:04:51.387  Compute HMAC                        24 ms  success  out=[1]
+  16:04:51.454  Check Signature                     38 ms  success  out=[1]
+  16:04:51.524  Signature Valid?                     3 ms  success  out=[1,0]
+  16:04:51.560  Is lead.created?                     3 ms  success  out=[1,0]
+  16:04:51.613  Get Lead                          8452 ms  success  out=[0,1]
+  16:05:00.079  Lead Unknown?                        4 ms  success  out=[1,0]
+  16:05:00.095  Skip Unknown Lead                   22 ms  success  out=[1]
