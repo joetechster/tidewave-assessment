@@ -78,6 +78,8 @@ describe('email briefs', () => {
     expect(html).toMatch(/<a [^>]*href="http:\/\/localhost:7080\/u\/abc"[^>]*>Unsubscribe<\/a>/);
 
     const text = bodyText(html).toLowerCase();
+    // The campaign page has no audio; only promise what it actually offers.
+    expect(text).not.toContain('listen to previews');
     for (const banned of ['profit', 'royalt', 'equity', 'interest', 'guarantee', 'hurry', 'last chance', 'limited time']) {
       expect(text).not.toContain(banned);
     }
