@@ -102,7 +102,7 @@ const commands = {
       const file = known[wf.id] || 'extra-' + (wf.name || wf.id).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
       out(`n8n/workflows/${file}.json`, keep);
     }
-    const ex = await http(URLS.n8n + '/rest/executions?limit=250', { headers: h });
+    const ex = await http(URLS.n8n + '/rest/executions?limit=100', { headers: h });
     out('evidence/n8n-executions.json', ex.body);
   },
   async evidence() {
